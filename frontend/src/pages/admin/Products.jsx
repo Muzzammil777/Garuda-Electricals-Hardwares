@@ -60,6 +60,27 @@ const Products = () => {
       const response = await categoriesAPI.getAll(false); // Get all categories including inactive
       console.log('Categories fetched:', response.data);
       setCategories(response.data);
+      
+      // If no categories exist, auto-seed default ones
+      if (!response.data || response.data.length === 0) {
+        console.log('No categories found, seeding default categories...');
+        try {
+          const seedResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://garuda-electricals-hardwares.onrender.com/api'}/categories/seed/initialize`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const seedData = await seedResponse.json();
+          console.log('Seeding response:', seedData);
+          
+          // Fetch categories again after seeding
+          setTimeout(async () => {
+            const retryResponse = await categoriesAPI.getAll(false);
+            setCategories(retryResponse.data);
+          }, 1000);
+        } catch (seedError) {
+          console.error('Error seeding categories:', seedError);
+        }
+      }
     } catch (error) {
       console.error('Error fetching categories:', error);
       toast.error('Failed to load categories');
