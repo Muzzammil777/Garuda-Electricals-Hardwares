@@ -44,3 +44,5 @@ frontend/dist/
 *.tmp
 *.temp
 .cache/
+.vercel
+.env*.local
