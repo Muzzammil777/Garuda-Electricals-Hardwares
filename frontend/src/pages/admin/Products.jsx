@@ -7,7 +7,8 @@ import {
   X, 
   Loader2,
   Package,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Upload
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { productsAPI, categoriesAPI } from '../../services/api';
@@ -33,6 +34,7 @@ const Products = () => {
     category_id: '',
     stock_quantity: '',
     image_url: '',
+    image_file: '',
     is_featured: false,
     is_active: true
   };
@@ -93,6 +95,35 @@ const Products = () => {
       ...formData,
       [name]: type === 'checkbox' ? checked : value
     });
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({
+        ...prev,
+        image_url: reader.result,
+        image_file: file.name
+      }));
+      toast.success('Image selected successfully');
+    };
+    reader.readAsDataURL(file);
   };
 
   const openCreateModal = () => {
@@ -516,16 +547,53 @@ const Products = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Image URL
+                    Product Image
                   </label>
-                  <input
-                    type="url"
-                    name="image_url"
-                    value={formData.image_url}
-                    onChange={handleInputChange}
-                    className="input"
-                    placeholder="https://..."
-                  />
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="file"
+                        id="image-upload"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-400 hover:bg-primary-50 cursor-pointer transition-colors"
+                      >
+                        <Upload className="w-5 h-5 text-gray-400" />
+                        <div className="text-center">
+                          <p className="text-sm font-medium text-gray-700">Click to upload</p>
+                          <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                        </div>
+                      </label>
+                    </div>
+                    {formData.image_url && (
+                      <div className="flex gap-3 items-start">
+                        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                          <img 
+                            src={formData.image_url} 
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-700">Image Preview</p>
+                          {formData.image_file && (
+                            <p className="text-xs text-gray-500">{formData.image_file}</p>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, image_url: '', image_file: '' }))}
+                            className="text-xs text-red-600 hover:text-red-700 mt-1"
+                          >
+                            Remove image
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="sm:col-span-2">
