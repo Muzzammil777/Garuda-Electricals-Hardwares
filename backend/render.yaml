@@ -1,0 +1,34 @@
+# Render.com deployment configuration for Backend
+# https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: garuda-electricals-api
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: BUSINESS_NAME
+        value: "Garuda Electricals & Hardwares"
+      - key: BUSINESS_ADDRESS
+        value: "No 51/1, Near Trichy Main Road, Gandhigramam, Karur-639004, Tamil Nadu"
+      - key: BUSINESS_PHONE
+        value: "+91 4324 251020"
+      - key: BUSINESS_EMAIL
+        value: "info@garudaelectricals.com"
+      - key: WHATSAPP_NUMBER
+        value: "917947143780"
