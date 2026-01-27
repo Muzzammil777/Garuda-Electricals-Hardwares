@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 1440  # 24 hours
     
     # CORS Settings
-    cors_origins: str = "http://localhost:5173,http://localhost:3000"
+    cors_origins: str = "https://garuda-electricals-hardwares.vercel.app/"
     
     # Business Information
     business_name: str = "Garuda Electricals & Hardwares"
