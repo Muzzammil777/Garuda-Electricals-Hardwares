@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { Menu, X, Phone } from 'lucide-react';
+import { Menu, X, Phone, LogIn } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 
 const Navbar = () => {
@@ -77,6 +77,13 @@ const Navbar = () => {
               <Phone className="w-4 h-4" />
               Call Us
             </a>
+            <Link
+              to="/admin/login"
+              className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+            >
+              <LogIn className="w-4 h-4" />
+              Admin
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -106,6 +113,16 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
+              <div className="px-4 py-2">
+                <Link
+                  to="/admin/login"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full px-4 py-2 text-center text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Admin Login
+                </Link>
+              </div>
               <div className="flex gap-2 mt-4 px-4">
                 <a
                   href={getWhatsAppLink()}
