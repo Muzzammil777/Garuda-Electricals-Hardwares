@@ -72,7 +72,7 @@ async def login(user_data: UserLogin, db: Client = Depends(get_db)):
         updated_at=user["updated_at"]
     )
     
-    return Token(access_token=access_token, token_type="bearer", user=user_response)
+    return {"access_token": access_token, "token_type": "bearer", "user": user_response.dict()}
 
 
 @router.post("/register", response_model=UserResponse)
