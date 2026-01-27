@@ -240,3 +240,110 @@ async def delete_category(
     db.table("categories").delete().eq("id", str(category_id)).execute()
     
     return {"message": "Category deleted successfully"}
+
+
+@router.post("/seed/initialize", response_model=dict)
+async def seed_default_categories(
+    db: Client = Depends(get_db)
+):
+    """
+    Initialize default electrical product categories
+    This is a public endpoint for initial setup
+    
+    Args:
+        db: Database client
+        
+    Returns:
+        Success message with number of categories created
+    """
+    default_categories = [
+        {
+            "name": "Wires & Cables",
+            "slug": "wires-cables",
+            "description": "Electrical wires, cables, and conductors",
+            "display_order": 1,
+            "is_active": True
+        },
+        {
+            "name": "Switches & Switchgear",
+            "slug": "switches-switchgear",
+            "description": "Electrical switches, MCBs, and switchgear",
+            "display_order": 2,
+            "is_active": True
+        },
+        {
+            "name": "Lighting",
+            "slug": "lighting",
+            "description": "LED lights, bulbs, tubes, and fixtures",
+            "display_order": 3,
+            "is_active": True
+        },
+        {
+            "name": "Fans",
+            "slug": "fans",
+            "description": "Electric fans and cooling equipment",
+            "display_order": 4,
+            "is_active": True
+        },
+        {
+            "name": "Panels & Boards",
+            "slug": "panels-boards",
+            "description": "Distribution panels and electrical boards",
+            "display_order": 5,
+            "is_active": True
+        },
+        {
+            "name": "Conduits & Fittings",
+            "slug": "conduits-fittings",
+            "description": "Electrical conduits and PVC fittings",
+            "display_order": 6,
+            "is_active": True
+        },
+        {
+            "name": "Plugs & Sockets",
+            "slug": "plugs-sockets",
+            "description": "Electrical plugs, sockets, and outlets",
+            "display_order": 7,
+            "is_active": True
+        },
+        {
+            "name": "Transformers & Stabilizers",
+            "slug": "transformers-stabilizers",
+            "description": "Transformers, voltage stabilizers, and converters",
+            "display_order": 8,
+            "is_active": True
+        },
+        {
+            "name": "Circuit Protection",
+            "slug": "circuit-protection",
+            "description": "MCBs, RCCBs, and circuit breakers",
+            "display_order": 9,
+            "is_active": True
+        },
+        {
+            "name": "Hardware & Accessories",
+            "slug": "hardware-accessories",
+            "description": "Electrical hardware, fasteners, and accessories",
+            "display_order": 10,
+            "is_active": True
+        }
+    ]
+    
+    created_count = 0
+    
+    for category_data in default_categories:
+        # Check if category already exists
+        existing = db.table("categories").select("id").eq("slug", category_data["slug"]).execute()
+        
+        if not existing.data:
+            try:
+                db.table("categories").insert(category_data).execute()
+                created_count += 1
+            except Exception as e:
+                print(f"Error creating category {category_data['name']}: {e}")
+    
+    return {
+        "message": f"Initialized {created_count} default categories",
+        "categories_created": created_count
+    }
+
