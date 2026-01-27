@@ -30,8 +30,8 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 1440  # 24 hours
     
-    # CORS Settings
-    cors_origins: str = "https://garuda-electricals-hardwares.vercel.app/"
+    # CORS Settings - Allow all origins in production (Vercel frontend)
+    cors_origins: str = "*"
     
     # Business Information
     business_name: str = "Garuda Electricals & Hardwares"
