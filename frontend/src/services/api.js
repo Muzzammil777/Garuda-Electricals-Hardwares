@@ -1,6 +1,22 @@
 import axios from 'axios';
 
-const API_URL = "https://garuda-electricals-hardwares.onrender.com";
+// Determine API URL based on environment
+const getAPIUrl = () => {
+  // If VITE_API_URL is set (from Vercel environment), use it
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // For local development
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8000/api';
+  }
+  
+  // For production (Vercel deployed)
+  return 'https://garuda-electricals-hardwares.onrender.com/api';
+};
+
+const API_URL = getAPIUrl();
 
 // Create axios instance
 const api = axios.create({
