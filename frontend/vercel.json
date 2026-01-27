@@ -20,7 +20,7 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "@api_url",
+    "VITE_API_URL": "https://garuda-electricals-hardwares.onrender.com/",
     "VITE_WHATSAPP_NUMBER": "@whatsapp_number"
   }
 }
