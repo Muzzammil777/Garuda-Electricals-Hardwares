@@ -57,10 +57,12 @@ const Products = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await categoriesAPI.getAll();
+      const response = await categoriesAPI.getAll(false); // Get all categories including inactive
+      console.log('Categories fetched:', response.data);
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
+      toast.error('Failed to load categories');
     }
   };
 
@@ -209,9 +211,13 @@ const Products = () => {
             className="input w-full sm:w-48"
           >
             <option value="">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
-            ))}
+            {categories && categories.length > 0 ? (
+              categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))
+            ) : (
+              <option disabled>No categories available</option>
+            )}
           </select>
         </div>
       </div>
@@ -409,10 +415,17 @@ const Products = () => {
                     className="input"
                   >
                     <option value="">Select category</option>
-                    {categories.map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
+                    {categories && categories.length > 0 ? (
+                      categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))
+                    ) : (
+                      <option disabled>No categories available</option>
+                    )}
                   </select>
+                  {categories.length === 0 && (
+                    <p className="text-xs text-amber-600 mt-1">⚠️ No categories found. Please create categories first.</p>
+                  )}
                 </div>
 
                 <div>
