@@ -25,6 +25,12 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [passwordReset, setPasswordReset] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -57,6 +63,54 @@ const Settings = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSettings(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordReset(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+    
+    if (!passwordReset.currentPassword || !passwordReset.newPassword || !passwordReset.confirmPassword) {
+      setMessage({ type: 'error', text: 'Please fill in all password fields.' });
+      return;
+    }
+
+    if (passwordReset.newPassword !== passwordReset.confirmPassword) {
+      setMessage({ type: 'error', text: 'New passwords do not match.' });
+      return;
+    }
+
+    if (passwordReset.newPassword.length < 6) {
+      setMessage({ type: 'error', text: 'New password must be at least 6 characters long.' });
+      return;
+    }
+
+    setResettingPassword(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      await settingsAPI.resetPassword({
+        current_password: passwordReset.currentPassword,
+        new_password: passwordReset.newPassword,
+      });
+      setMessage({ type: 'success', text: 'Password reset successfully! Please log in again.' });
+      setPasswordReset({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      // Optionally redirect to login after a delay
+      setTimeout(() => {
+        window.location.href = '/admin/login';
+      }, 2000);
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      setMessage({ 
+        type: 'error', 
+        text: error.response?.data?.detail || 'Failed to reset password. Please check your current password and try again.' 
+      });
+    } finally {
+      setResettingPassword(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -346,6 +400,79 @@ const Settings = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Password Reset */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+            <svg className="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Change Password
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">Update your account password to keep your account secure.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={passwordReset.currentPassword}
+                onChange={handlePasswordChange}
+                placeholder="Enter your current password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+            </div>
+            <div></div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordReset.newPassword}
+                onChange={handlePasswordChange}
+                placeholder="Enter new password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+              <p className="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordReset.confirmPassword}
+                onChange={handlePasswordChange}
+                placeholder="Confirm new password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={handlePasswordReset}
+              disabled={resettingPassword}
+              className="px-6 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 focus:ring-4 focus:ring-red-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+            >
+              {resettingPassword ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Changing Password...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Change Password
+                </>
+              )}
+            </button>
           </div>
         </div>
 

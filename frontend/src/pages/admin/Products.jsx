@@ -22,6 +22,7 @@ const Products = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [imageInputMode, setImageInputMode] = useState('upload');
 
   const initialFormState = {
     name: '',
@@ -129,6 +130,7 @@ const Products = () => {
   const openCreateModal = () => {
     setEditingProduct(null);
     setFormData(initialFormState);
+    setImageInputMode('upload');
     setShowModal(true);
   };
 
@@ -148,6 +150,7 @@ const Products = () => {
       is_featured: product.is_featured || false,
       is_active: product.is_active !== false
     });
+    setImageInputMode('url');
     setShowModal(true);
   };
 
@@ -550,47 +553,118 @@ const Products = () => {
                     Product Image
                   </label>
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="file"
-                        id="image-upload"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="image-upload"
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-400 hover:bg-primary-50 cursor-pointer transition-colors"
+                    {/* Toggle Button */}
+                    <div className="flex gap-2 border border-gray-200 rounded-lg p-1 bg-gray-50">
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode('upload')}
+                        className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
+                          imageInputMode === 'upload'
+                            ? 'bg-white text-primary-600 border border-primary-200 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
                       >
-                        <Upload className="w-5 h-5 text-gray-400" />
-                        <div className="text-center">
-                          <p className="text-sm font-medium text-gray-700">Click to upload</p>
-                          <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
-                        </div>
-                      </label>
+                        <Upload className="w-4 h-4 inline mr-2" />
+                        Upload
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode('url')}
+                        className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
+                          imageInputMode === 'url'
+                            ? 'bg-white text-primary-600 border border-primary-200 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        <ImageIcon className="w-4 h-4 inline mr-2" />
+                        URL
+                      </button>
                     </div>
-                    {formData.image_url && (
-                      <div className="flex gap-3 items-start">
-                        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                          <img 
-                            src={formData.image_url} 
-                            alt="Preview"
-                            className="w-full h-full object-cover"
+
+                    {/* Upload Mode */}
+                    {imageInputMode === 'upload' && (
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="file"
+                            id="image-upload"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
                           />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-700">Image Preview</p>
-                          {formData.image_file && (
-                            <p className="text-xs text-gray-500">{formData.image_file}</p>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => setFormData(prev => ({ ...prev, image_url: '', image_file: '' }))}
-                            className="text-xs text-red-600 hover:text-red-700 mt-1"
+                          <label
+                            htmlFor="image-upload"
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-400 hover:bg-primary-50 cursor-pointer transition-colors"
                           >
-                            Remove image
-                          </button>
+                            <Upload className="w-5 h-5 text-gray-400" />
+                            <div className="text-center">
+                              <p className="text-sm font-medium text-gray-700">Click to upload</p>
+                              <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                            </div>
+                          </label>
                         </div>
+                        {formData.image_url && (
+                          <div className="flex gap-3 items-start mt-3">
+                            <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                              <img 
+                                src={formData.image_url} 
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-700">Image Preview</p>
+                              {formData.image_file && (
+                                <p className="text-xs text-gray-500">{formData.image_file}</p>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, image_url: '', image_file: '' }))}
+                                className="text-xs text-red-600 hover:text-red-700 mt-1"
+                              >
+                                Remove image
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* URL Mode */}
+                    {imageInputMode === 'url' && (
+                      <div>
+                        <input
+                          type="url"
+                          value={formData.image_url}
+                          onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
+                          placeholder="https://example.com/image.jpg"
+                          className="input"
+                        />
+                        {formData.image_url && (
+                          <div className="flex gap-3 items-start mt-3">
+                            <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                              <img 
+                                src={formData.image_url} 
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                                onError={() => {
+                                  toast.error('Invalid image URL');
+                                }}
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-700">Image Preview</p>
+                              <p className="text-xs text-gray-500 break-all">{formData.image_url}</p>
+                              <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, image_url: '' }))}
+                                className="text-xs text-red-600 hover:text-red-700 mt-1"
+                              >
+                                Remove URL
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

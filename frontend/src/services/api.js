@@ -147,6 +147,7 @@ export const settingsAPI = {
   get: () => api.get('/settings/'),
   update: (data) => api.put('/settings/', data),
   initialize: () => api.post('/settings/initialize'),
+  resetPassword: (data) => api.post('/settings/reset-password', data),
 };
 
 // Business Info API
