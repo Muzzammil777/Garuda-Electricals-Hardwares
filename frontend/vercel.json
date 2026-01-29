@@ -17,8 +17,7 @@
     "src": "/(.*)",
     "dest": "/index.html"
   }
-]
-  ],
+],
   "env": {
     "VITE_API_URL": "https://garuda-electricals-hardwares.onrender.com/api",
     "VITE_WHATSAPP_NUMBER": "919489114403"
