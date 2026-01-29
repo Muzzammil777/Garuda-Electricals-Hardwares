@@ -4,12 +4,20 @@ Handles site-wide settings like contact details
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from supabase import Client
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from app.database import get_db
-from app.utils.auth import get_current_active_admin
+from app.utils.auth import get_current_active_admin, get_password_hash, verify_password, get_current_user
 
 router = APIRouter(prefix="/settings", tags=["Settings"])
+
+# Pydantic models
+class ResetPasswordRequest(BaseModel):
+    """Reset password request model"""
+    old_password: str
+    new_password: str
+    confirm_password: str
 
 # Default settings
 DEFAULT_SETTINGS = {
@@ -130,3 +138,61 @@ async def initialize_settings(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to initialize settings: {str(e)}"
         )
+
+
+@router.post("/reset-password")
+async def reset_password(
+    reset_data: ResetPasswordRequest,
+    db: Client = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Reset/Change user password (Admin only)
+    
+    Args:
+        reset_data: Password reset data with old_password, new_password, confirm_password
+        db: Database client
+        current_user: Current authenticated user
+        
+    Returns:
+        Success message
+    """
+    # Validate passwords match
+    if reset_data.new_password != reset_data.confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New passwords do not match"
+        )
+    
+    # Validate old password
+    if not verify_password(reset_data.old_password, current_user["password_hash"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    # Validate new password is different from old password
+    if reset_data.old_password == reset_data.new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different from current password"
+        )
+    
+    # Hash new password
+    new_password_hash = get_password_hash(reset_data.new_password)
+    
+    # Update password in database
+    result = db.table("users").update(
+        {"password_hash": new_password_hash}
+    ).eq("id", current_user["id"]).execute()
+    
+    if not result.data:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update password"
+        )
+    
+    return {
+        "message": "Password changed successfully",
+        "email": current_user.get("email", "")
+    }
