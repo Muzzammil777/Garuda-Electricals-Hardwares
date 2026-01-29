@@ -13,6 +13,7 @@ import Contact from './pages/public/Contact';
 
 // Admin Pages
 import Login from './pages/admin/Login';
+import ResetPassword from './pages/admin/ResetPassword';
 import Dashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import AdminCustomers from './pages/admin/Customers';
@@ -67,6 +68,8 @@ function App() {
           
           {/* Admin Login */}
           <Route path="/admin/login" element={<Login />} />
+          <Route path="/admin" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
           {/* Protected Admin Routes */}
           <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
