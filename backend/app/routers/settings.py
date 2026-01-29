@@ -15,8 +15,9 @@ router = APIRouter(prefix="/settings", tags=["Settings"])
 # Pydantic models
 class ResetPasswordRequest(BaseModel):
     """Reset password request model"""
-    current_password: str
+    old_password: str
     new_password: str
+    confirm_password: str
 
 # Default settings
 DEFAULT_SETTINGS = {
