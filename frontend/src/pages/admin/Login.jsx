@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Loader2, Shield, X } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import ForgotPasswordModal from '../../components/ForgotPasswordModal';
 import toast from 'react-hot-toast';
-import api from '../../services/api';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -12,9 +12,7 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showForgotModal, setShowForgotModal] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotLoading, setForgotLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -38,25 +36,6 @@ const Login = () => {
       toast.error(error.response?.data?.detail || 'Invalid credentials');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    setForgotLoading(true);
-
-    try {
-      await api.post('/auth/forgot-password', {
-        email: forgotEmail
-      });
-      toast.success('Password reset email sent! Please check your inbox.');
-      setShowForgotModal(false);
-      setForgotEmail('');
-    } catch (error) {
-      console.error('Forgot password error:', error);
-      toast.error(error.response?.data?.detail || 'Failed to send reset email');
-    } finally {
-      setForgotLoading(false);
     }
   };
 
@@ -134,6 +113,16 @@ const Login = () => {
               </div>
             </div>
 
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+              >
+                Forgot Password?
+              </button>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -149,16 +138,6 @@ const Login = () => {
               )}
             </button>
           </form>
-
-          {/* Forgot Password Link */}
-          <div className="text-center mt-4">
-            <button
-              onClick={() => setShowForgotModal(true)}
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-            >
-              Forgot your password?
-            </button>
-          </div>
         </div>
 
         {/* Back to site */}
@@ -168,68 +147,6 @@ const Login = () => {
           </Link>
         </div>
       </div>
-
-      {/* Forgot Password Modal */}
-      {showForgotModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Reset Password</h2>
-              <button
-                onClick={() => setShowForgotModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <p className="text-gray-600 mb-6">
-              Enter your email address and we'll send you a link to reset your password.
-            </p>
-
-            <form onSubmit={handleForgotPassword} className="space-y-4">
-              <div>
-                <label htmlFor="forgot-email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="forgot-email"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  required
-                  className="input"
-                  placeholder="your-email@example.com"
-                />
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowForgotModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={forgotLoading}
-                  className="flex-1 btn-primary flex items-center justify-center gap-2"
-                >
-                  {forgotLoading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    'Send Reset Link'
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

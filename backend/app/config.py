@@ -44,9 +44,11 @@ class Settings(BaseSettings):
     whatsapp_api_url: str = "https://api.whatsapp.com/send"
     whatsapp_business_phone: str = "919876543210"
     
-    # Email Configuration (Brevo API)
-    brevo_api_key: str = ""  # Brevo API key from https://brevo.com
+    # Email Configuration (Gmail SMTP)
+    smtp_server: str = "smtp.gmail.com"
+    smtp_port: int = 587
     email_address: str = "Garudaelectricals@gmail.com"
+    email_password: str = ""  # App password for Gmail
     email_sender_name: str = "Garuda Electricals & Hardwares"
     
     # Password Reset Configuration
