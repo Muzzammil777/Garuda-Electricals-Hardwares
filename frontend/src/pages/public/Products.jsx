@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Filter, X, Loader2 } from 'lucide-react';
+import { Search, Filter, X, Loader2, ChevronDown } from 'lucide-react';
 import { productsAPI, categoriesAPI } from '../../services/api';
 import ProductCard from '../../components/ProductCard';
 import CategoryCard from '../../components/CategoryCard';
+
+const ITEMS_PER_PAGE = 20;
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -11,6 +13,10 @@ const Products = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
   
   const categorySlug = searchParams.get('category') || '';
   const searchQuery = searchParams.get('search') || '';
@@ -20,8 +26,15 @@ const Products = () => {
   }, []);
 
   useEffect(() => {
-    fetchProducts();
-  }, [categorySlug, searchQuery]);
+    setPage(1);
+    fetchProducts(1);
+  }, [categorySlug, searchQuery, fetchProducts]);
+
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      fetchProducts(page + 1);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -32,21 +45,38 @@ const Products = () => {
     }
   };
 
-  const fetchProducts = async () => {
-    setLoading(true);
+  const fetchProducts = useCallback(async (pageNum = 1) => {
+    if (pageNum === 1) setLoading(true);
+    else setLoadingMore(true);
+    
     try {
-      const params = {};
+      const params = {
+        limit: ITEMS_PER_PAGE,
+        offset: (pageNum - 1) * ITEMS_PER_PAGE
+      };
       if (categorySlug) params.category_slug = categorySlug;
       if (searchQuery) params.search = searchQuery;
       
       const response = await productsAPI.getAll(params);
-      setProducts(response.data);
+      const data = Array.isArray(response.data) ? response.data : response.data.products || [];
+      const total = response.data.total || data.length;
+      
+      if (pageNum === 1) {
+        setProducts(data);
+      } else {
+        setProducts(prev => [...prev, ...data]);
+      }
+      
+      setTotalCount(total);
+      setHasMore((pageNum * ITEMS_PER_PAGE) < total);
+      setPage(pageNum);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  };
+  }, [categorySlug, searchQuery]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -219,7 +249,7 @@ const Products = () => {
             <h2 className="text-xl font-semibold text-gray-900">
               {selectedCategory ? `${selectedCategory.name}` : 'All Products'}
               <span className="text-gray-500 font-normal ml-2">
-                ({products.length} products)
+                ({products.length}{totalCount > products.length ? ` of ${totalCount}` : ''} products)
               </span>
             </h2>
           </div>
@@ -242,11 +272,36 @@ const Products = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+              
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="mt-12 flex justify-center">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="btn-primary flex items-center gap-2"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        Load More Products
+                        <ChevronDown className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

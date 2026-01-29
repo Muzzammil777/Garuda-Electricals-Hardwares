@@ -15,6 +15,22 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false
+    sourcemap: false,
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-router-dom'],
+          'api': ['axios'],
+        }
+      }
+    },
+    // Reduce initial load time
+    target: 'esnext',
+    chunkSizeWarningLimit: 600,
+  },
+  // Optimize dependencies
+  optimizeDeps: {
+    include: ['react', 'react-router-dom', 'axios'],
   }
 })

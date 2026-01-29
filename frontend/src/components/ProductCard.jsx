@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Package } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
+import { useState } from 'react';
 
 const ProductCard = ({ product }) => {
   const { getWhatsAppLink } = useSettings();
+  const [imageLoaded, setImageLoaded] = useState(false);
   
   const whatsappMessage = `Hi! I'm interested in the following product from Garuda Electricals:\n\n📦 Product: ${product.name}${product.brand ? ` (${product.brand})` : ''}\n\nPlease provide more details about price and availability.`;
 
@@ -15,7 +17,11 @@ const ProductCard = ({ product }) => {
           <img
             src={product.image_url}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            onLoad={() => setImageLoaded(true)}
+            className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${
+              !imageLoaded ? 'blur-sm' : 'blur-0'
+            }`}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

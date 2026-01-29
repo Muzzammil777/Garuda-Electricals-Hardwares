@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from supabase import Client
 from typing import List, Optional
 from uuid import UUID
+from pydantic import BaseModel
 from app.database import get_db
 from app.schemas.product import (
     ProductCreate, 
@@ -20,6 +21,15 @@ from app.utils.whatsapp import generate_product_enquiry_link
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
+class PaginatedResponse(BaseModel):
+    """Pagination response wrapper"""
+    products: List[ProductWithCategory]
+    total: int
+    limit: int
+    offset: int
+    has_more: bool
+
+
 @router.get("/", response_model=List[ProductWithCategory])
 async def get_products(
     category_id: Optional[UUID] = Query(None, description="Filter by category"),
@@ -27,12 +37,12 @@ async def get_products(
     featured: Optional[bool] = Query(None, description="Filter by featured status"),
     active_only: bool = Query(True, description="Filter by active status"),
     search: Optional[str] = Query(None, description="Search in name and description"),
-    limit: int = Query(50, ge=1, le=100, description="Number of results"),
+    limit: int = Query(20, ge=1, le=100, description="Number of results"),
     offset: int = Query(0, ge=0, description="Offset for pagination"),
     db: Client = Depends(get_db)
 ):
     """
-    Get all products with optional filters
+    Get all products with optional filters and pagination
     
     Args:
         category_id: Filter by category ID
@@ -40,16 +50,26 @@ async def get_products(
         featured: Filter by featured status
         active_only: If True, only return active products
         search: Search query
-        limit: Number of results
+        limit: Number of results (default: 20, max: 100)
         offset: Pagination offset
         db: Database client
         
     Returns:
         List of products
     """
-    # Base query
-    query = db.table("products").select("*, categories(name, slug)").order("created_at", desc=True)
+    # Build filter conditions
+    filters = []
     
+    if active_only:
+        filters.append("is_active.eq.true")
+    
+    if featured is not None:
+        filters.append(f"is_featured.eq.{str(featured).lower()}")
+    
+    # Base query with select
+    query = db.table("products").select("*, categories(name, slug)")
+    
+    # Apply filters
     if active_only:
         query = query.eq("is_active", True)
     
@@ -68,7 +88,8 @@ async def get_products(
         if cat_result.data:
             query = query.eq("category_id", cat_result.data[0]["id"])
     
-    # Apply pagination
+    # Order and apply pagination
+    query = query.order("created_at", desc=True)
     query = query.range(offset, offset + limit - 1)
     
     result = query.execute()

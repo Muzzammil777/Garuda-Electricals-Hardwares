@@ -232,43 +232,137 @@ VITE_WHATSAPP_NUMBER=919489114403
 
 ## 🚀 Running Locally
 
-### Start Backend
+### Quick Start (All-in-One)
+
+```bash
+# Clone and navigate to project
+git clone <repo-url>
+cd garuda-electricals
+
+# Setup backend
+cd backend
+python -m venv venv
+# Activate (Windows)
+venv\Scripts\activate
+# Activate (Linux/Mac)
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Setup frontend (in new terminal)
+cd ../frontend
+npm install
+```
+
+### Option 1: Run Backend & Frontend Separately
+
+#### Start Backend
 
 ```bash
 cd backend
 
-# Create virtual environment
+# Create virtual environment (first time only)
 python -m venv venv
 
-# Activate (Windows)
+# Activate virtual environment
+# On Windows:
 venv\Scripts\activate
-
-# Activate (Linux/Mac)
+# On Linux/Mac:
 source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run server
+# Run development server
 uvicorn app.main:app --reload --port 8000
 ```
 
-Backend available at: `http://localhost:8000`  
-API Docs: `http://localhost:8000/docs`
+**Backend will be available at:**
+- App: `http://localhost:8000`
+- API Docs (Swagger): `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
-### Start Frontend
+#### Start Frontend (in a new terminal)
 
 ```bash
 cd frontend
 
-# Install dependencies
+# Install dependencies (first time only)
 npm install
 
 # Run development server
 npm run dev
 ```
 
-Frontend available at: `http://localhost:5173`
+**Frontend will be available at:** `http://localhost:5173`
+
+### Option 2: Run Both Concurrently
+
+#### Windows (PowerShell)
+
+```powershell
+# Terminal 1 - Backend
+cd backend
+venv\Scripts\activate
+uvicorn app.main:app --reload --port 8000
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+```
+
+#### Linux/Mac
+
+```bash
+# Terminal 1 - Backend
+cd backend
+source venv/bin/activate
+uvicorn app.main:app --reload --port 8000
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+```
+
+### Option 3: Using npm-run-all (Concurrent from Root)
+
+Install concurrently package (optional):
+```bash
+npm install -g concurrently
+```
+
+Then create a root script and run both from project root.
+
+### Verify Everything Works
+
+1. **Check Backend API:**
+   - Visit: `http://localhost:8000/docs`
+   - You should see Swagger UI with all API endpoints
+
+2. **Check Frontend:**
+   - Visit: `http://localhost:5173`
+   - You should see the Garuda Electricals website
+
+3. **Test Authentication:**
+   - Go to Admin Panel in frontend
+   - Login with credentials:
+     - Email: `Garudaelectrical@gmail.com`
+     - Password: `admin123`
+
+### Common Issues & Solutions
+
+| Issue | Solution |
+|-------|----------|
+| Port 8000 already in use | `uvicorn app.main:app --reload --port 8001` |
+| Port 5173 already in use | `npm run dev -- --port 5174` |
+| Module not found (backend) | Ensure venv is activated: `source venv/bin/activate` |
+| npm ERR (frontend) | Delete `node_modules` and `package-lock.json`, then run `npm install` |
+| CORS errors | Check `.env` CORS_ORIGINS matches your frontend URL |
+| Database connection issues | Verify `.env` has correct Supabase credentials |
+
+### Stop Development Servers
+
+- **Backend:** Press `Ctrl + C` in backend terminal
+- **Frontend:** Press `Ctrl + C` in frontend terminal
 
 ---
 
