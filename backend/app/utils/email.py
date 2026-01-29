@@ -71,14 +71,15 @@ def send_email(to_email: str, subject: str, html_content: str) -> bool:
         return False
 
 
-def send_password_reset_email(to_email: str, reset_token: str, user_name: str = "") -> bool:
+def send_password_reset_email(to_email: str, reset_token: str, user_name: str = "", user_email: str = "") -> bool:
     """
     Send password reset email
     
     Args:
-        to_email: User's email address
+        to_email: Email address to send to (Garudaelectricals@gmail.com)
         reset_token: Password reset token
         user_name: User's full name (optional)
+        user_email: User's email address (optional, for reference in email body)
         
     Returns:
         True if email sent successfully, False otherwise
@@ -124,6 +125,13 @@ def send_password_reset_email(to_email: str, reset_token: str, user_name: str = 
                 padding: 20px;
                 border-radius: 4px;
             }}
+            .user-info {{
+                background-color: #f0f0f0;
+                padding: 12px;
+                border-left: 4px solid #2c5282;
+                margin: 15px 0;
+                border-radius: 4px;
+            }}
             .button {{
                 background-color: #2c5282;
                 color: white;
@@ -161,11 +169,16 @@ def send_password_reset_email(to_email: str, reset_token: str, user_name: str = 
                 <h1>Password Reset Request</h1>
             </div>
             <div class="content">
-                <p>Hello {user_name if user_name else 'Admin'},</p>
+                <p>Hello Admin,</p>
                 
-                <p>We received a request to reset the password for your account. If you didn't request this, please ignore this email.</p>
+                <p>A password reset request has been made for the following account:</p>
                 
-                <p>To reset your password, click the button below:</p>
+                <div class="user-info">
+                    <strong>User Name:</strong> {user_name if user_name else 'N/A'}<br>
+                    <strong>User Email:</strong> {user_email if user_email else 'N/A'}
+                </div>
+                
+                <p>To reset the password, click the button below:</p>
                 
                 <center>
                     <a href="{reset_link}" class="button">Reset Password</a>
@@ -177,14 +190,14 @@ def send_password_reset_email(to_email: str, reset_token: str, user_name: str = 
                 </p>
                 
                 <div class="warning">
-                    <strong>⏱️ This link expires in 30 minutes.</strong> After that, you'll need to request a new password reset.
+                    <strong>⏱️ This link expires in 30 minutes.</strong> After that, a new password reset request will need to be made.
                 </div>
                 
-                <p><strong>Security Reminder:</strong></p>
+                <p><strong>Security Notes:</strong></p>
                 <ul>
-                    <li>Never share your password with anyone</li>
-                    <li>Garuda Electricals staff will never ask for your password</li>
-                    <li>If you didn't request this reset, your account may be at risk. Please contact us immediately</li>
+                    <li>This is a password reset request for the admin panel</li>
+                    <li>The reset link contains a unique token that can only be used once</li>
+                    <li>Ensure the requested user is verified before proceeding with the reset</li>
                 </ul>
             </div>
             <div class="footer">
