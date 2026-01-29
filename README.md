@@ -382,21 +382,29 @@ Then create a root script and run both from project root.
 | **Build Command** | `pip install -r requirements.txt` |
 | **Start Command** | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
 
-4. Add Environment Variables:
-   - `SUPABASE_URL`
-   - `SUPABASE_KEY`
-   - `SECRET_KEY`
-   - `ALGORITHM` = `HS256`
-   - `ACCESS_TOKEN_EXPIRE_MINUTES` = `1440`
-   - `CORS_ORIGINS` = `https://your-app.vercel.app`
+4. Add Environment Variables in Render settings:
+   - `APP_ENV` = `production`
+   - `DEBUG` = `false`
+   - `SUPABASE_URL` = Your Supabase URL
+   - `SUPABASE_KEY` = Your Supabase anon key
+   - `SUPABASE_SERVICE_KEY` = Your Supabase service key
+   - `JWT_SECRET_KEY` = Your secret key (min 32 chars)
+   - `JWT_ALGORITHM` = `HS256`
+   - `JWT_ACCESS_TOKEN_EXPIRE_MINUTES` = `1440`
+   - `CORS_ORIGINS` = `https://garuda-electricals.in,https://your-domain.com` (comma-separated)
+   - `BUSINESS_NAME`, `BUSINESS_PHONE`, `BUSINESS_EMAIL`, `BUSINESS_GST` (your business details)
+   - `WHATSAPP_BUSINESS_PHONE` = `919489114403`
 
 5. Deploy and copy the URL
 
-### Frontend on Vercel
+### Frontend Deployment
 
-1. Go to [vercel.com](https://vercel.com) → **Add New** → **Project**
-2. Import your GitHub repository
-3. Configure:
+Deploy to Vercel, custom domain, or any static host:
+
+1. **Vercel (Recommended)**
+   - Go to [vercel.com](https://vercel.com) → **Add New** → **Project**
+   - Import your GitHub repository
+   - Configure:
 
 | Setting | Value |
 |---------|-------|
@@ -405,18 +413,31 @@ Then create a root script and run both from project root.
 | **Build Command** | `npm run build` |
 | **Output Directory** | `dist` |
 
-4. Add Environment Variables:
+2. **Environment Variables:**
    - `VITE_API_URL` = `https://your-render-url.onrender.com/api`
    - `VITE_WHATSAPP_NUMBER` = `919489114403`
+   - `VITE_APP_NAME` = `Garuda Electricals & Hardwares`
 
-5. Deploy!
+3. **Deploy!**
 
-### Post-Deployment
+### Post-Deployment Setup
 
-Update CORS on Render after getting your Vercel URL:
-```
-CORS_ORIGINS=https://garuda-electricals.vercel.app
-```
+#### Update CORS on Render
+
+After deploying frontend, update `CORS_ORIGINS` on Render dashboard:
+
+1. Go to Render → Your API service
+2. Go to **Settings** → **Environment**
+3. Update `CORS_ORIGINS` to include your production domains:
+   ```
+   CORS_ORIGINS=https://garuda-electricals.in,https://your-custom-domain.com
+   ```
+
+#### Link Custom Domain (Optional)
+
+1. In Vercel/hosting platform, add your custom domain
+2. Update Render's `CORS_ORIGINS` with the new domain
+3. Ensure DNS is properly configured
 
 ---
 

@@ -107,10 +107,16 @@ async def create_offer(
     Returns:
         Created offer
     """
-    # Prepare data
+    # Prepare data and convert Decimal to float for JSON serialization
     data = offer_data.model_dump()
-    if data.get("discount_percentage"):
-        data["discount_percentage"] = float(data["discount_percentage"])
+    
+    # Convert Decimal to float
+    if data.get("discount_percentage") is not None:
+        from decimal import Decimal
+        if isinstance(data["discount_percentage"], Decimal):
+            data["discount_percentage"] = float(data["discount_percentage"])
+    
+    # Convert dates to strings
     if data.get("start_date"):
         data["start_date"] = str(data["start_date"])
     if data.get("end_date"):
@@ -159,8 +165,13 @@ async def update_offer(
     # Update offer
     update_data = {k: v for k, v in offer_data.model_dump().items() if v is not None}
     
-    if update_data.get("discount_percentage"):
-        update_data["discount_percentage"] = float(update_data["discount_percentage"])
+    # Convert Decimal to float for JSON serialization
+    if update_data.get("discount_percentage") is not None:
+        from decimal import Decimal
+        if isinstance(update_data["discount_percentage"], Decimal):
+            update_data["discount_percentage"] = float(update_data["discount_percentage"])
+    
+    # Convert dates to strings
     if update_data.get("start_date"):
         update_data["start_date"] = str(update_data["start_date"])
     if update_data.get("end_date"):

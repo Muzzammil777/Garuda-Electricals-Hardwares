@@ -2,7 +2,7 @@
 Pydantic schemas for Customer
 """
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, field_validator
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
@@ -12,13 +12,21 @@ class CustomerBase(BaseModel):
     """Base customer schema"""
     name: str
     phone: str
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     address: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None
     pincode: Optional[str] = None
     gst_number: Optional[str] = None
     notes: Optional[str] = None
+    
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v):
+        """Validate email format if provided"""
+        if v and '@' not in v:
+            raise ValueError('Invalid email format')
+        return v
 
 
 class CustomerCreate(CustomerBase):
@@ -30,7 +38,7 @@ class CustomerUpdate(BaseModel):
     """Schema for updating a customer"""
     name: Optional[str] = None
     phone: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     address: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None
@@ -38,6 +46,14 @@ class CustomerUpdate(BaseModel):
     gst_number: Optional[str] = None
     notes: Optional[str] = None
     is_active: Optional[bool] = None
+    
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v):
+        """Validate email format if provided"""
+        if v and '@' not in v:
+            raise ValueError('Invalid email format')
+        return v
 
 
 class CustomerResponse(CustomerBase):
