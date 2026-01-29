@@ -14,6 +14,11 @@ from app.utils.auth import (
     get_current_user,
     get_current_active_admin
 )
+from app.utils.email import send_password_reset_email
+from app.config import settings
+from pydantic import EmailStr, BaseModel
+from datetime import datetime, timedelta
+import secrets
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -188,7 +193,6 @@ async def change_password(
     db.table("users").update({"password_hash": new_password_hash}).eq("id", current_user["id"]).execute()
     
     return {"message": "Password changed successfully"}
-<<<<<<< HEAD
 
 
 # ========== FORGOT PASSWORD ENDPOINTS ==========
@@ -328,5 +332,3 @@ async def reset_password(
     
     return {"message": "Password has been reset successfully. You can now login with your new password."}
 
-=======
->>>>>>> parent of f15ed40 (reset)
