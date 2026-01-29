@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Loader2, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import ForgotPasswordModal from '../../components/ForgotPasswordModal';
 import toast from 'react-hot-toast';
-import api from '../../services/api';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -13,7 +11,6 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -112,16 +109,6 @@ const Login = () => {
                   )}
                 </button>
               </div>
-            </div>
-
-            <div className="text-right">
-              <button
-                type="button"
-                onClick={() => setShowForgotPassword(true)}
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
-              >
-                Forgot Password?
-              </button>
             </div>
 
             <button
