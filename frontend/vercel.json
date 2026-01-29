@@ -9,23 +9,15 @@
       }
     }
   ],
-  "routes": [
-    {
-      "src": "/sitemap.xml",
-      "dest": "/sitemap.xml"
-    },
-    {
-      "src": "/logo\\.png",
-      "dest": "/logo.png"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+ "routes": [
+  {
+    "handle": "filesystem"
+  },
+  {
+    "src": "/(.*)",
+    "dest": "/index.html"
+  }
+]
   ],
   "env": {
     "VITE_API_URL": "https://garuda-electricals-hardwares.onrender.com/api",
