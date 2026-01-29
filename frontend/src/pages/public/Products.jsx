@@ -21,21 +21,7 @@ const Products = () => {
   const categorySlug = searchParams.get('category') || '';
   const searchQuery = searchParams.get('search') || '';
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    setPage(1);
-    fetchProducts(1);
-  }, [categorySlug, searchQuery, fetchProducts]);
-
-  const handleLoadMore = () => {
-    if (!loadingMore && hasMore) {
-      fetchProducts(page + 1);
-    }
-  };
-
+  // Define fetchCategories
   const fetchCategories = async () => {
     try {
       const response = await categoriesAPI.getWithCounts();
@@ -45,6 +31,7 @@ const Products = () => {
     }
   };
 
+  // Define fetchProducts with useCallback
   const fetchProducts = useCallback(async (pageNum = 1) => {
     if (pageNum === 1) setLoading(true);
     else setLoadingMore(true);
@@ -77,6 +64,22 @@ const Products = () => {
       setLoadingMore(false);
     }
   }, [categorySlug, searchQuery]);
+
+  // Effects
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    setPage(1);
+    fetchProducts(1);
+  }, [categorySlug, searchQuery, fetchProducts]);
+
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      fetchProducts(page + 1);
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
