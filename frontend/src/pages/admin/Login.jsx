@@ -4,6 +4,7 @@ import { Eye, EyeOff, Loader2, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import ForgotPasswordModal from '../../components/ForgotPasswordModal';
 import toast from 'react-hot-toast';
+import api from '../../services/api';
 
 const Login = () => {
   const [formData, setFormData] = useState({
