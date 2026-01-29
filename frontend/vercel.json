@@ -11,6 +11,10 @@
   ],
   "routes": [
     {
+      "src": "/sitemap.xml",
+      "dest": "/sitemap.xml"
+    },
+    {
       "src": "/logo\\.png",
       "dest": "/logo.png"
     },
