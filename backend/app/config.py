@@ -44,15 +44,6 @@ class Settings(BaseSettings):
     whatsapp_api_url: str = "https://api.whatsapp.com/send"
     whatsapp_business_phone: str = "919876543210"
     
-    # Email Configuration (Brevo API)
-    brevo_api_key: str = ""  # Brevo API key from https://brevo.com
-    email_address: str = "Garudaelectricals@gmail.com"
-    email_sender_name: str = "Garuda Electricals & Hardwares"
-    
-    # Password Reset Configuration
-    password_reset_token_expire_minutes: int = 30
-    frontend_reset_url: str = "http://localhost:3000/reset-password"
-    
     @property
     def cors_origins_list(self) -> List[str]:
         """Parse CORS origins string into list"""
