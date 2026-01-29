@@ -251,12 +251,11 @@ async def forgot_password(
             detail="Failed to create password reset token"
         )
     
-    # Send email with reset link (to company email only)
+    # Send email with reset link
     email_sent = send_password_reset_email(
-        to_email=settings.email_address,
+        to_email=user["email"],
         reset_token=reset_token,
-        user_name=user["full_name"],
-        user_email=user["email"]
+        user_name=user["full_name"]
     )
     
     if not email_sent:
