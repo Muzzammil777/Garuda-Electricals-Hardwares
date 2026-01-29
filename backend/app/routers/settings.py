@@ -15,9 +15,8 @@ router = APIRouter(prefix="/settings", tags=["Settings"])
 # Pydantic models
 class ResetPasswordRequest(BaseModel):
     """Reset password request model"""
-    old_password: str
+    current_password: str
     new_password: str
-    confirm_password: str
 
 # Default settings
 DEFAULT_SETTINGS = {
@@ -150,32 +149,32 @@ async def reset_password(
     Reset/Change user password (Admin only)
     
     Args:
-        reset_data: Password reset data with old_password, new_password, confirm_password
+        reset_data: Password reset data with current_password and new_password
         db: Database client
         current_user: Current authenticated user
         
     Returns:
         Success message
     """
-    # Validate passwords match
-    if reset_data.new_password != reset_data.confirm_password:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="New passwords do not match"
-        )
-    
-    # Validate old password
-    if not verify_password(reset_data.old_password, current_user["password_hash"]):
+    # Validate current password
+    if not verify_password(reset_data.current_password, current_user["password_hash"]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Current password is incorrect"
         )
     
     # Validate new password is different from old password
-    if reset_data.old_password == reset_data.new_password:
+    if reset_data.current_password == reset_data.new_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="New password must be different from current password"
+        )
+    
+    # Validate password length
+    if len(reset_data.new_password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 6 characters long"
         )
     
     # Hash new password
