@@ -58,7 +58,7 @@ async def get_products(
         List of products
     """
     # Select only necessary fields for better performance
-    product_fields = "id,name,slug,brand,price,unit,image_url,short_description,is_featured,is_active,category_id,created_at"
+    product_fields = "id,name,slug,brand,price,unit,image_url,short_description,is_featured,is_active,category_id,created_at,updated_at"
     
     # Base query with select
     query = db.table("products").select(f"{product_fields}, categories(name, slug)")
@@ -115,7 +115,7 @@ async def get_featured_products(
         List of featured products
     """
     # Select only necessary fields for better performance
-    product_fields = "id,name,slug,brand,price,unit,image_url,short_description,is_featured,category_id,created_at"
+    product_fields = "id,name,slug,brand,price,unit,image_url,short_description,is_featured,category_id,created_at,updated_at"
     
     result = db.table("products").select(f"{product_fields}, categories(name, slug)").eq("is_active", True).eq("is_featured", True).order("created_at", desc=True).limit(limit).execute()
     
