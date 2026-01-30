@@ -51,12 +51,22 @@ app = FastAPI(
 )
 
 # Configure CORS
+cors_origins = [
+    "http://localhost:3000",  # Local development
+    "http://localhost:5173",  # Vite dev server
+    "https://garuda-electricals.in",  # Production domain
+    "https://www.garuda-electricals.in",  # www subdomain
+    "https://garuda-electricals-hardwares.vercel.app",  # Vercel deployment
+    "*"  # Allow all origins (can be removed if production domain only is needed)
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Include routers
