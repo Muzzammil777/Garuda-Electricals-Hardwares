@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
 import { Package } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
-import { useState } from 'react';
+import { useState, memo, useMemo } from 'react';
 
-const ProductCard = ({ product }) => {
+const ProductCard = memo(({ product }) => {
   const { getWhatsAppLink } = useSettings();
   const [imageLoaded, setImageLoaded] = useState(false);
   
-  const whatsappMessage = `Hi! I'm interested in the following product from Garuda Electricals:\n\n📦 Product: ${product.name}${product.brand ? ` (${product.brand})` : ''}\n\nPlease provide more details about price and availability.`;
+  const whatsappMessage = useMemo(() => 
+    `Hi! I'm interested in the following product from Garuda Electricals:\n\n📦 Product: ${product.name}${product.brand ? ` (${product.brand})` : ''}\n\nPlease provide more details about price and availability.`,
+    [product.name, product.brand]
+  );
 
   return (
     <div className="card-hover group">
@@ -91,6 +94,8 @@ const ProductCard = ({ product }) => {
       </div>
     </div>
   );
-};
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;

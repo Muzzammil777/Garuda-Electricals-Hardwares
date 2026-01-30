@@ -30,7 +30,7 @@ const Home = () => {
     try {
       const [catRes, prodRes, offersRes] = await Promise.all([
         categoriesAPI.getWithCounts(),
-        productsAPI.getFeatured(4),
+        productsAPI.getFeatured(8),
         offersAPI.getAll()
       ]);
       setCategories(catRes.data);

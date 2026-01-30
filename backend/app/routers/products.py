@@ -57,17 +57,11 @@ async def get_products(
     Returns:
         List of products
     """
-    # Build filter conditions
-    filters = []
-    
-    if active_only:
-        filters.append("is_active.eq.true")
-    
-    if featured is not None:
-        filters.append(f"is_featured.eq.{str(featured).lower()}")
+    # Select only necessary fields for better performance
+    product_fields = "id,name,slug,brand,price,unit,image_url,short_description,is_featured,is_active,category_id,created_at"
     
     # Base query with select
-    query = db.table("products").select("*, categories(name, slug)")
+    query = db.table("products").select(f"{product_fields}, categories(name, slug)")
     
     # Apply filters
     if active_only:
@@ -120,7 +114,10 @@ async def get_featured_products(
     Returns:
         List of featured products
     """
-    result = db.table("products").select("*, categories(name, slug)").eq("is_active", True).eq("is_featured", True).limit(limit).execute()
+    # Select only necessary fields for better performance
+    product_fields = "id,name,slug,brand,price,unit,image_url,short_description,is_featured,category_id,created_at"
+    
+    result = db.table("products").select(f"{product_fields}, categories(name, slug)").eq("is_active", True).eq("is_featured", True).order("created_at", desc=True).limit(limit).execute()
     
     products = []
     for product in result.data:

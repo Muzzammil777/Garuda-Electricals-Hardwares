@@ -66,6 +66,8 @@ CREATE TABLE products (
 CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_products_slug ON products(slug);
 CREATE INDEX idx_products_featured ON products(is_featured);
+CREATE INDEX idx_products_active_featured ON products(is_active, is_featured);
+CREATE INDEX idx_products_active_category ON products(is_active, category_id);
 
 -- ============================================
 -- CUSTOMERS TABLE

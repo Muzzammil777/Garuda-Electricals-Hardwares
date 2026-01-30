@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { memo } from 'react';
 import { 
   Cable, 
   ToggleLeft, 
@@ -17,7 +18,7 @@ const iconMap = {
   'settings': Settings,
 };
 
-const CategoryCard = ({ category }) => {
+const CategoryCard = memo(({ category }) => {
   const Icon = iconMap[category.icon] || Cable;
 
   return (
@@ -38,6 +39,8 @@ const CategoryCard = ({ category }) => {
       )}
     </Link>
   );
-};
+});
+
+CategoryCard.displayName = 'CategoryCard';
 
 export default CategoryCard;

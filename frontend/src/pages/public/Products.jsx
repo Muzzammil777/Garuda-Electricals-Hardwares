@@ -5,7 +5,7 @@ import { productsAPI, categoriesAPI } from '../../services/api';
 import ProductCard from '../../components/ProductCard';
 import CategoryCard from '../../components/CategoryCard';
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 40;
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
