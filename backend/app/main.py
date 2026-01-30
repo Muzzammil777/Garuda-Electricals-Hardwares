@@ -57,16 +57,16 @@ cors_origins = [
     "https://garuda-electricals.in",  # Production domain
     "https://www.garuda-electricals.in",  # www subdomain
     "https://garuda-electricals-hardwares.vercel.app",  # Vercel deployment
-    "*"  # Allow all origins (can be removed if production domain only is needed)
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
-    allow_credentials=True,
+    allow_credentials=False,  # Changed to False to work with proper CORS
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=600,  # Cache preflight for 10 minutes
 )
 
 # Include routers
