@@ -79,6 +79,7 @@ const Login = () => {
                 required
                 className="input"
                 placeholder="Garudaelectrical@gmail.com"
+                autoComplete="email"
               />
             </div>
 
@@ -96,6 +97,7 @@ const Login = () => {
                   required
                   className="input pr-12"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"

@@ -141,6 +141,7 @@ const ResetPassword = () => {
                     className="input pr-12"
                     placeholder="••••••••"
                     disabled={loading}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
@@ -172,6 +173,7 @@ const ResetPassword = () => {
                     className="input pr-12"
                     placeholder="••••••••"
                     disabled={loading}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"

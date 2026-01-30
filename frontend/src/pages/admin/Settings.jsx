@@ -93,8 +93,9 @@ const Settings = () => {
 
     try {
       await settingsAPI.resetPassword({
-        current_password: passwordReset.currentPassword,
+        old_password: passwordReset.currentPassword,
         new_password: passwordReset.newPassword,
+        confirm_password: passwordReset.confirmPassword,
       });
       setMessage({ type: 'success', text: 'Password reset successfully! Please log in again.' });
       setPasswordReset({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -104,9 +105,15 @@ const Settings = () => {
       }, 2000);
     } catch (error) {
       console.error('Error resetting password:', error);
+      let errorText = 'Failed to reset password. Please check your current password and try again.';
+      if (error.response?.data?.detail) {
+        errorText = typeof error.response.data.detail === 'string' 
+          ? error.response.data.detail 
+          : 'Failed to reset password. Please check your current password and try again.';
+      }
       setMessage({ 
         type: 'error', 
-        text: error.response?.data?.detail || 'Failed to reset password. Please check your current password and try again.' 
+        text: errorText
       });
     } finally {
       setResettingPassword(false);
@@ -422,6 +429,7 @@ const Settings = () => {
                 onChange={handlePasswordChange}
                 placeholder="Enter your current password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                autoComplete="current-password"
               />
             </div>
             <div></div>
@@ -434,6 +442,7 @@ const Settings = () => {
                 onChange={handlePasswordChange}
                 placeholder="Enter new password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                autoComplete="new-password"
               />
               <p className="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
             </div>
@@ -445,6 +454,7 @@ const Settings = () => {
                 value={passwordReset.confirmPassword}
                 onChange={handlePasswordChange}
                 placeholder="Confirm new password"
+                autoComplete="new-password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               />
             </div>
