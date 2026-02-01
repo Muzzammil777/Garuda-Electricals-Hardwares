@@ -111,6 +111,14 @@ const Login = () => {
                   )}
                 </button>
               </div>
+              <div className="mt-2 text-right">
+                <Link 
+                  to="/admin/forgot-password" 
+                  className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
             <button

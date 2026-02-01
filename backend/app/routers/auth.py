@@ -11,11 +11,14 @@ from app.utils.auth import (
     verify_password, 
     get_password_hash, 
     create_access_token,
+    create_password_reset_token,
+    verify_password_reset_token,
     get_current_user,
     get_current_active_admin
 )
+from app.utils.email import send_password_reset_email
 from app.config import settings
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -192,3 +195,113 @@ async def change_password(
     
     return {"message": "Password changed successfully"}
 
+
+# Password Reset Request Schema
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+# Reset Password Schema
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    request: ForgotPasswordRequest,
+    db: Client = Depends(get_db)
+):
+    """
+    Request a password reset link
+    Only sends email if the entered email is Garudaelectricals@gmail.com
+    
+    Args:
+        request: Email address
+        db: Database client
+        
+    Returns:
+        Success message (always returns success for security)
+    """
+    # Only send email if the entered email is the admin email
+    if request.email.lower() != "garudaelectricals@gmail.com":
+        return {"message": "If the email exists, a password reset link has been sent"}
+    
+    # Find user by email
+    result = db.table("users").select("*").eq("email", request.email).execute()
+    
+    # Always return success message even if user not found (security best practice)
+    # This prevents email enumeration attacks
+    if not result.data:
+        return {"message": "If the email exists, a password reset link has been sent to Garudaelectricals@gmail.com"}
+    
+    user = result.data[0]
+    
+    # Check if user is active
+    if not user.get("is_active"):
+        return {"message": "If the email exists, a password reset link has been sent to Garudaelectricals@gmail.com"}
+    
+    # Create password reset token
+    reset_token = create_password_reset_token(user["email"])
+    
+    # Send reset email to admin email
+    try:
+        send_password_reset_email(reset_token)
+    except Exception as e:
+        print(f"Error sending password reset email: {str(e)}")
+        # Don't reveal the error to the user
+    
+    return {"message": "A password reset link has been sent to Garudaelectricals@gmail.com"}
+
+
+@router.post("/reset-password")
+async def reset_password(
+    request: ResetPasswordRequest,
+    db: Client = Depends(get_db)
+):
+    """
+    Reset password using token from email
+    
+    Args:
+        request: Reset token and new password
+        db: Database client
+        
+    Returns:
+        Success message
+    """
+    # Verify token and get email
+    email = verify_password_reset_token(request.token)
+    
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired password reset token"
+        )
+    
+    # Find user
+    result = db.table("users").select("*").eq("email", email).execute()
+    
+    if not result.data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    user = result.data[0]
+    
+    # Hash new password
+    new_password_hash = get_password_hash(request.new_password)
+    
+    # Update password
+    update_result = db.table("users").update({
+        "password_hash": new_password_hash,
+        "updated_at": datetime.utcnow().isoformat()
+    }).eq("id", user["id"]).execute()
+    
+    if not update_result.data:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update password"
+        )
+    
+    return {"message": "Password reset successfully"}
