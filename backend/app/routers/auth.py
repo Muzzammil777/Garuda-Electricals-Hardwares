@@ -214,7 +214,7 @@ async def forgot_password(
 ):
     """
     Request a password reset link
-    Only sends email if the entered email is Garudaelectricals@gmail.com
+    Only sends email if the entered email matches the admin email
     
     Args:
         request: Email address
@@ -224,7 +224,7 @@ async def forgot_password(
         Success message (always returns success for security)
     """
     # Only send email if the entered email is the admin email
-    if request.email.lower() != "mohammedmuzzammil.offic@gmail.com":
+    if request.email.lower() != "garudaelectricals@gmail.com":
         return {"message": "If the email exists, a password reset link has been sent"}
     
     # Find user by email
@@ -233,13 +233,13 @@ async def forgot_password(
     # Always return success message even if user not found (security best practice)
     # This prevents email enumeration attacks
     if not result.data:
-        return {"message": "If the email exists, a password reset link has been sent to mohammedmuzzammil.offic@gmail.com"}
+        return {"message": "If the email exists, a password reset link has been sent to Garudaelectricals@gmail.com"}
     
     user = result.data[0]
     
     # Check if user is active
     if not user.get("is_active"):
-        return {"message": "If the email exists, a password reset link has been sent to mohammedmuzzammil.offic@gmail.com"}
+        return {"message": "If the email exists, a password reset link has been sent to Garudaelectricals@gmail.com"}
     
     # Create password reset token
     reset_token = create_password_reset_token(user["email"])
@@ -251,7 +251,7 @@ async def forgot_password(
         print(f"Error sending password reset email: {str(e)}")
         # Don't reveal the error to the user
     
-    return {"message": "A password reset link has been sent to mohammedmuzzammil.offic@gmail.com"}
+    return {"message": "A password reset link has been sent to Garudaelectricals@gmail.com"}
 
 
 @router.post("/reset-password")
