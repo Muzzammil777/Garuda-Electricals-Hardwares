@@ -78,7 +78,7 @@ const Login = () => {
                 onChange={handleChange}
                 required
                 className="input"
-                placeholder="Garudaelectrical@gmail.com"
+                placeholder="mohammedmuzzammil.offic@gmail.com"
                 autoComplete="email"
               />
             </div>

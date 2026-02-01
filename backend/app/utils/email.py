@@ -9,13 +9,13 @@ from app.config import settings
 from typing import Optional
 
 
-def send_password_reset_email(reset_token: str, recipient_email: str = "Garudaelectricals@gmail.com") -> bool:
+def send_password_reset_email(reset_token: str, recipient_email: str = "mohammedmuzzammil.offic@gmail.com") -> bool:
     """
     Send password reset email with reset link
     
     Args:
         reset_token: The password reset token
-        recipient_email: Email address to send to (default: Garudaelectricals@gmail.com)
+        recipient_email: Email address to send to (default: mohammedmuzzammil.offic@gmail.com)
         
     Returns:
         True if email sent successfully, False otherwise

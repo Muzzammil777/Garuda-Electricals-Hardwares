@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     # Email Configuration (Gmail SMTP)
     smtp_server: str = "smtp.gmail.com"
     smtp_port: int = 587
-    email_address: str = "Garudaelectricals@gmail.com"
+    email_address: str = "mohammedmuzzammil.offic@gmail.com"
     email_password: str = ""  # App password for Gmail
     email_sender_name: str = "Garuda Electricals & Hardwares"
     
