@@ -225,6 +225,7 @@ async def forgot_password(
     """
     # Only send email if the entered email is the admin email
     if request.email.lower() != "mohammedmuzzammil.offic@gmail.com":
+        print(f"Email mismatch: {request.email.lower()} != mohammedmuzzammil.offic@gmail.com")
         return {"message": "If the email exists, a password reset link has been sent"}
     
     # Find user by email
@@ -233,22 +234,32 @@ async def forgot_password(
     # Always return success message even if user not found (security best practice)
     # This prevents email enumeration attacks
     if not result.data:
-        return {"message": "If the email exists, a password reset link has been sent to Garudaelectricals@gmail.com"}
+        print(f"No user found with email: {request.email}")
+        return {"message": "If the email exists, a password reset link has been sent to mohammedmuzzammil.offic@gmail.com"}
     
     user = result.data[0]
+    print(f"User found: {user['email']}, Active: {user.get('is_active')}")
     
     # Check if user is active
     if not user.get("is_active"):
-        return {"message": "If the email exists, a password reset link has been sent to Garudaelectricals@gmail.com"}
+        print(f"User is not active: {user['email']}")
+        return {"message": "If the email exists, a password reset link has been sent to mohammedmuzzammil.offic@gmail.com"}
     
     # Create password reset token
     reset_token = create_password_reset_token(user["email"])
+    print(f"Password reset token created for: {user['email']}")
     
     # Send reset email to admin email
     try:
-        send_password_reset_email(reset_token)
+        result = send_password_reset_email(reset_token)
+        if result:
+            print(f"Password reset email sent successfully to mohammedmuzzammil.offic@gmail.com")
+        else:
+            print(f"Failed to send password reset email (send_password_reset_email returned False)")
     except Exception as e:
         print(f"Error sending password reset email: {str(e)}")
+        import traceback
+        traceback.print_exc()
         # Don't reveal the error to the user
     
     return {"message": "A password reset link has been sent to mohammedmuzzammil.offic@gmail.com"}
