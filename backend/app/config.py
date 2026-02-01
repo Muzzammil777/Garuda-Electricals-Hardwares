@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     
     # Password Reset Configuration
     password_reset_token_expire_minutes: int = 30
-    frontend_reset_url: str = "https://garuda-electricals.vercel.app/admin/reset-password"
+    frontend_reset_url: str = "https://garuda-electricals.in/admin/reset-password"
     
     @property
     def cors_origins_list(self) -> List[str]:
