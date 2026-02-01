@@ -44,11 +44,10 @@ class Settings(BaseSettings):
     whatsapp_api_url: str = "https://api.whatsapp.com/send"
     whatsapp_business_phone: str = "919876543210"
     
-    # Email Configuration (Gmail SMTP)
-    smtp_server: str = "smtp.gmail.com"
-    smtp_port: int = 587
+    # Email Configuration (Resend)
+    resend_api_key: str = ""
+    email_from: str = "onboarding@resend.dev"  # Use your verified domain email
     email_address: str = "mohammedmuzzammil.offic@gmail.com"
-    email_password: str = ""  # App password for Gmail
     email_sender_name: str = "Garuda Electricals & Hardwares"
     
     # Password Reset Configuration

@@ -1,17 +1,15 @@
 """
-Email utilities for sending password reset and other emails
+Email utilities for sending password reset and other emails using Resend
 """
 
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import resend
 from app.config import settings
 from typing import Optional
 
 
 def send_password_reset_email(reset_token: str, recipient_email: str = "mohammedmuzzammil.offic@gmail.com") -> bool:
     """
-    Send password reset email with reset link
+    Send password reset email with reset link using Resend
     
     Args:
         reset_token: The password reset token
@@ -21,14 +19,11 @@ def send_password_reset_email(reset_token: str, recipient_email: str = "mohammed
         True if email sent successfully, False otherwise
     """
     try:
+        # Set API key
+        resend.api_key = settings.resend_api_key
+        
         # Create reset link
         reset_link = f"{settings.frontend_reset_url}?token={reset_token}"
-        
-        # Create message
-        message = MIMEMultipart("alternative")
-        message["Subject"] = "Password Reset Request - Garuda Electricals"
-        message["From"] = f"{settings.email_sender_name} <{settings.email_address}>"
-        message["To"] = recipient_email
         
         # Create HTML content
         html_content = f"""
@@ -115,88 +110,59 @@ def send_password_reset_email(reset_token: str, recipient_email: str = "mohammed
         </html>
         """
         
-        # Create plain text version
-        text_content = f"""
-        Password Reset Request - Garuda Electricals & Hardwares
+        # Send email using Resend
+        params = {
+            "from": f"{settings.email_sender_name} <{settings.email_from}>",
+            "to": [recipient_email],
+            "subject": "Password Reset Request - Garuda Electricals",
+            "html": html_content,
+        }
         
-        Hello Admin,
-        
-        You have requested to reset your password for the Garuda Electricals & Hardwares admin panel.
-        
-        Click the link below to reset your password:
-        {reset_link}
-        
-        This link will expire in {settings.password_reset_token_expire_minutes} minutes for security reasons.
-        
-        If you didn't request this password reset, please ignore this email.
-        
-        Best regards,
-        Garuda Electricals & Hardwares Team
-        
-        {settings.business_address}
-        Phone: {settings.business_phone} | Email: {settings.business_email}
-        """
-        
-        # Attach both versions
-        part1 = MIMEText(text_content, "plain")
-        part2 = MIMEText(html_content, "html")
-        message.attach(part1)
-        message.attach(part2)
-        
-        # Send email
-        with smtplib.SMTP(settings.smtp_server, settings.smtp_port) as server:
-            server.starttls()
-            server.login(settings.email_address, settings.email_password)
-            server.send_message(message)
-        
+        email = resend.Emails.send(params)
+        print(f"Email sent successfully via Resend. ID: {email.get('id')}")
         return True
         
     except Exception as e:
-        print(f"Error sending email: {str(e)}")
+        print(f"Error sending email via Resend: {str(e)}")
         return False
 
 
 def send_email(
     subject: str,
     recipient: str,
-    text_content: str,
-    html_content: Optional[str] = None
+    html_content: str,
+    text_content: Optional[str] = None
 ) -> bool:
     """
-    Generic email sending utility
+    Generic email sending utility using Resend
     
     Args:
         subject: Email subject
         recipient: Recipient email address
-        text_content: Plain text email content
-        html_content: Optional HTML email content
+        html_content: HTML email content
+        text_content: Optional plain text email content
         
     Returns:
         True if email sent successfully, False otherwise
     """
     try:
-        message = MIMEMultipart("alternative")
-        message["Subject"] = subject
-        message["From"] = f"{settings.email_sender_name} <{settings.email_address}>"
-        message["To"] = recipient
+        resend.api_key = settings.resend_api_key
         
-        # Attach text version
-        part1 = MIMEText(text_content, "plain")
-        message.attach(part1)
+        params = {
+            "from": f"{settings.email_sender_name} <{settings.email_from}>",
+            "to": [recipient],
+            "subject": subject,
+            "html": html_content,
+        }
         
-        # Attach HTML version if provided
-        if html_content:
-            part2 = MIMEText(html_content, "html")
-            message.attach(part2)
+        if text_content:
+            params["text"] = text_content
         
-        # Send email
-        with smtplib.SMTP(settings.smtp_server, settings.smtp_port) as server:
-            server.starttls()
-            server.login(settings.email_address, settings.email_password)
-            server.send_message(message)
-        
+        email = resend.Emails.send(params)
+        print(f"Email sent successfully via Resend. ID: {email.get('id')}")
         return True
         
     except Exception as e:
-        print(f"Error sending email: {str(e)}")
+        print(f"Error sending email via Resend: {str(e)}")
         return False
+
