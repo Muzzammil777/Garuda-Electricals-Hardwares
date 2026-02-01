@@ -228,26 +228,12 @@ async def forgot_password(
         print(f"Email mismatch: {request.email.lower()} != mohammedmuzzammil.offic@gmail.com")
         return {"message": "If the email exists, a password reset link has been sent"}
     
-    # Find user by email
-    result = db.table("users").select("*").eq("email", request.email).execute()
+    # TEMPORARY: Skip user check for testing
+    print(f"TESTING MODE: Sending password reset email without user check")
     
-    # Always return success message even if user not found (security best practice)
-    # This prevents email enumeration attacks
-    if not result.data:
-        print(f"No user found with email: {request.email}")
-        return {"message": "If the email exists, a password reset link has been sent to mohammedmuzzammil.offic@gmail.com"}
-    
-    user = result.data[0]
-    print(f"User found: {user['email']}, Active: {user.get('is_active')}")
-    
-    # Check if user is active
-    if not user.get("is_active"):
-        print(f"User is not active: {user['email']}")
-        return {"message": "If the email exists, a password reset link has been sent to mohammedmuzzammil.offic@gmail.com"}
-    
-    # Create password reset token
-    reset_token = create_password_reset_token(user["email"])
-    print(f"Password reset token created for: {user['email']}")
+    # Create password reset token with the email
+    reset_token = create_password_reset_token(request.email)
+    print(f"Password reset token created for: {request.email}")
     
     # Send reset email to admin email
     try:
