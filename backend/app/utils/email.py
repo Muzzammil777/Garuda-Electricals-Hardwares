@@ -7,7 +7,7 @@ from app.config import settings
 from typing import Optional
 
 
-def send_password_reset_email(reset_token: str, recipient_email: str = "Garudaelectricals@gmail.com") -> bool:
+def send_password_reset_email(reset_token: str, recipient_email: str = "garudaelectrical@gmail.com") -> bool:
     """
     Send password reset email with reset link using Resend
     

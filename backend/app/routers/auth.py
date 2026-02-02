@@ -224,7 +224,7 @@ async def forgot_password(
         Success message (always returns success for security)
     """
     # Only send email if the entered email is the admin email
-    if request.email.lower() != "garudaelectricals@gmail.com":
+    if request.email.lower() != "garudaelectrical@gmail.com":
         return {"message": "If the email exists, a password reset link has been sent"}
     
     # Find user by email
@@ -239,7 +239,7 @@ async def forgot_password(
     
     # Check if user is active
     if not user.get("is_active"):
-        return {"message": "If the email exists, a password reset link has been sent to Garudaelectricals@gmail.com"}
+        return {"message": "If the email exists, a password reset link has been sent to Garudaelectrical@gmail.com"}
     
     # Create password reset token
     reset_token = create_password_reset_token(user["email"])

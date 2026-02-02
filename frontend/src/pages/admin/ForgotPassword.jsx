@@ -111,7 +111,7 @@ const ForgotPassword = () => {
             <div className="space-y-6">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-green-800 text-sm">
-                  We've sent a password reset link to <strong>Garudaelectricals@gmail.com</strong>. 
+                  We've sent a password reset link to <strong>garudaelectrical@gmail.com</strong>. 
                   Please check your inbox and click the link to reset your password.
                 </p>
               </div>
