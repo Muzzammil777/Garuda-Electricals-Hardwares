@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     # Email Configuration (Resend)
     resend_api_key: str = ""
     email_from: str = "onboarding@resend.dev"  # Use your verified domain email
-    email_address: str = "Garudaelectrical@gmail.com"
+    email_address: str = "garudaelectrical@gmail.com"
     email_sender_name: str = "Garuda Electricals & Hardwares"
     
     # Password Reset Configuration
