@@ -60,7 +60,7 @@ const ForgotPassword = () => {
             </h1>
             <p className="text-gray-600 mt-2">
               {success 
-                ? 'A password reset link has been sent to Garudaelectricals@gmail.com' 
+                ? "A password reset link has been sent to Admin's email address." 
                 : 'Enter your email to receive a password reset link'}
             </p>
           </div>
@@ -81,7 +81,7 @@ const ForgotPassword = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="input pl-10"
-                    placeholder="Garudaelectricals@gmail.com"
+                    placeholder="Garudaelectrical@gmail.com"
                     autoComplete="email"
                   />
                 </div>
@@ -111,7 +111,7 @@ const ForgotPassword = () => {
             <div className="space-y-6">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-green-800 text-sm">
-                  We've sent a password reset link to <strong>garudaelectrical@gmail.com</strong>. 
+                  We've sent a password reset link to <strong>Admin's Mail</strong>. 
                   Please check your inbox and click the link to reset your password.
                 </p>
               </div>
