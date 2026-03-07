@@ -100,6 +100,7 @@ class InvoiceSummary(BaseModel):
     id: UUID
     invoice_number: str
     customer_name: Optional[str] = None
+    customer_phone: Optional[str] = None
     invoice_date: date
     total_amount: Decimal
     status: str

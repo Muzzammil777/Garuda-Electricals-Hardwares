@@ -167,11 +167,28 @@ const CreateInvoice = () => {
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
           toast.success('PDF downloaded! Please attach it to WhatsApp.', { id: 'pdf-gen' });
-          
-          // Then open WhatsApp with message
-          const whatsappRes = await invoicesAPI.getWhatsAppLink(invoiceId);
-          if (whatsappRes.data?.whatsapp_url) {
-            window.open(whatsappRes.data.whatsapp_url, '_blank');
+
+          // Open WhatsApp using the customer phone already loaded in the customers list
+          const selectedCustomer = customers.find(c => c.id === formData.customer_id);
+          const rawPhone = selectedCustomer?.phone || '';
+          const digits = rawPhone.replace(/\D/g, '');
+          const phone = digits.length === 10 ? '91' + digits : digits;
+
+          if (phone) {
+            const message =
+              `Dear ${selectedCustomer?.name || 'Customer'},\n\n` +
+              `Thank you for your purchase at *Garuda Electricals & Hardwares*!\n\n` +
+              `*Invoice:* #${invoiceNumber}\n` +
+              `Please find the PDF invoice attached.\n\n` +
+              `For any queries, contact us at 917947143780.\n\n` +
+              `Best regards,\n*Garuda Electricals & Hardwares*`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+          } else {
+            // Fallback: use API if no phone available on frontend
+            const whatsappRes = await invoicesAPI.getWhatsAppLink(invoiceId);
+            if (whatsappRes.data?.whatsapp_url) {
+              window.open(whatsappRes.data.whatsapp_url, '_blank');
+            }
           }
         } catch (err) {
           console.log('Auto-send failed:', err);

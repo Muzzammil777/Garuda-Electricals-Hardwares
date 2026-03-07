@@ -60,14 +60,33 @@ const Invoices = () => {
     }
   };
 
-  const handleWhatsAppShare = async (invoiceId) => {
-    try {
-      const response = await whatsappAPI.shareInvoice(invoiceId);
-      window.open(response.data.whatsapp_url, '_blank');
-    } catch (error) {
-      console.error('Error generating WhatsApp link:', error);
-      toast.error('Failed to generate WhatsApp link');
+  const handleWhatsAppShare = async (invoice) => {
+    // Build phone number from the invoice's customer_phone
+    const rawPhone = invoice.customer_phone || '';
+    const digits = rawPhone.replace(/\D/g, '');
+    const phone = digits.length === 10 ? '91' + digits : digits;
+
+    if (!phone) {
+      // Fallback: open WhatsApp with no pre-filled number via API
+      try {
+        const response = await whatsappAPI.shareInvoice(invoice.id);
+        window.open(response.data.whatsapp_url, '_blank');
+      } catch (error) {
+        console.error('Error generating WhatsApp link:', error);
+        toast.error('Could not load customer phone number');
+      }
+      return;
     }
+
+    const message =
+      `Dear ${invoice.customer_name || 'Customer'},\n\n` +
+      `Thank you for your purchase at *Garuda Electricals & Hardwares*!\n\n` +
+      `*Invoice:* #${invoice.invoice_number}\n` +
+      `*Total Amount:* Rs.${parseFloat(invoice.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}\n\n` +
+      `For any queries, contact us at 917947143780.\n\n` +
+      `Best regards,\n*Garuda Electricals & Hardwares*`;
+
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleStatusChange = async (invoiceId, newStatus) => {
@@ -238,7 +257,7 @@ const Invoices = () => {
                           )}
                         </button>
                         <button
-                          onClick={() => handleWhatsAppShare(invoice.id)}
+                          onClick={() => handleWhatsAppShare(invoice)}
                           className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                           title="Share on WhatsApp"
                         >

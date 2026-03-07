@@ -90,7 +90,7 @@ async def get_invoices(
     Returns:
         List of invoices
     """
-    query = db.table("invoices").select("*, customers(name)").order("created_at", desc=True)
+    query = db.table("invoices").select("*, customers(name, phone)").order("created_at", desc=True)
     
     if status_filter:
         query = query.eq("status", status_filter)
@@ -116,6 +116,7 @@ async def get_invoices(
     for inv in result.data:
         customer_data = inv.pop("customers", None)
         inv["customer_name"] = customer_data["name"] if customer_data else None
+        inv["customer_phone"] = customer_data["phone"] if customer_data else None
         invoices.append(inv)
     
     return invoices
@@ -304,7 +305,7 @@ async def get_invoice_whatsapp_link(
         WhatsApp URL
     """
     # Get invoice with customer
-    result = db.table("invoices").select("invoice_number, total_amount, subtotal, tax_amount, invoice_date, customers(phone, name)").eq("id", str(invoice_id)).execute()
+    result = db.table("invoices").select("invoice_number, total_amount, subtotal, tax_amount, invoice_date, customer_id, customers(phone, name)").eq("id", str(invoice_id)).execute()
     
     if not result.data:
         raise HTTPException(
@@ -313,9 +314,18 @@ async def get_invoice_whatsapp_link(
         )
     
     invoice = result.data[0]
-    customer_data = invoice.get("customers", {})
+    customer_data = invoice.get("customers") or {}
     customer_phone = customer_data.get("phone") if customer_data else None
     customer_name = customer_data.get("name") if customer_data else "Customer"
+
+    # Fallback: query customers table directly if join didn't return phone
+    if not customer_phone:
+        cust_id = invoice.get("customer_id")
+        if cust_id:
+            cust_result = db.table("customers").select("phone, name").eq("id", str(cust_id)).execute()
+            if cust_result.data:
+                customer_phone = cust_result.data[0].get("phone")
+                customer_name = cust_result.data[0].get("name") or customer_name
     
     # Get invoice items
     items_result = db.table("invoice_items").select("product_name, quantity, unit_price, total_amount").eq("invoice_id", str(invoice_id)).execute()
