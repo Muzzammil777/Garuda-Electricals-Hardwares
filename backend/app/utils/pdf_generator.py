@@ -88,10 +88,32 @@ def generate_invoice_pdf(invoice_data: Dict[str, Any]) -> BytesIO:
     elements = []
     
     # ===== HEADER SECTION =====
-    elements.append(Paragraph(settings.business_name, title_style))
-    elements.append(Paragraph(settings.business_address, subtitle_style))
-    elements.append(Paragraph(f"Phone: {settings.business_phone} | Email: {settings.business_email}", subtitle_style))
-    elements.append(Paragraph(f"GSTIN: {settings.business_gst}", subtitle_style))
+    logo_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'static', 'logo.png'))
+
+    if os.path.exists(logo_path):
+        logo_img = Image(logo_path, width=2*cm, height=2*cm)
+        header_text = (
+            f"<font size='20' color='#1e40af'><b>{settings.business_name}</b></font><br/>"
+            f"<font color='#6b7280'>{settings.business_address}</font><br/>"
+            f"<font color='#6b7280'>Phone: {settings.business_phone} | Email: {settings.business_email}</font><br/>"
+            f"<font color='#6b7280'>GSTIN: {settings.business_gst}</font>"
+        )
+        header_para = Paragraph(header_text, ParagraphStyle(
+            'HeaderText', parent=styles['Normal'], fontSize=10, leading=16
+        ))
+        header_table = Table([[logo_img, header_para]], colWidths=[2.5*cm, 15.5*cm])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+            ('RIGHTPADDING', (0, 0), (0, 0), 10),
+        ]))
+        elements.append(header_table)
+    else:
+        elements.append(Paragraph(settings.business_name, title_style))
+        elements.append(Paragraph(settings.business_address, subtitle_style))
+        elements.append(Paragraph(f"Phone: {settings.business_phone} | Email: {settings.business_email}", subtitle_style))
+        elements.append(Paragraph(f"GSTIN: {settings.business_gst}", subtitle_style))
+
     elements.append(Spacer(1, 0.5*cm))
     
     # Divider line
