@@ -32,11 +32,11 @@ const Navbar = () => {
               alt="Garuda Electricals" 
               className="w-14 h-14 md:w-28 md:h-28 object-contain"
             />
-            <div className="hidden sm:block">
-              <h1 className="text-lg md:text-xl font-bold text-gray-900 leading-tight">
-                {settings.business_name?.split(' ')[0] || 'Garuda'} {settings.business_name?.split(' ')[1] || 'Electricals'}
+            <div className="block max-w-[10.5rem] sm:max-w-none">
+              <h1 className="text-sm sm:text-lg md:text-xl font-bold text-gray-900 leading-tight line-clamp-2 sm:line-clamp-none">
+                {settings.business_name || 'Garuda Electricals'}
               </h1>
-              <p className="text-xs text-gray-500 -mt-0.5">& Hardwares</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 -mt-0.5">& Hardwares</p>
             </div>
           </Link>
 
