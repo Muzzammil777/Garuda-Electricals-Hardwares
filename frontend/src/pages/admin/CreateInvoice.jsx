@@ -6,18 +6,21 @@ import {
   Search,
   Loader2,
   ArrowLeft,
-  Calculator
+  Calculator,
+  Tag
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { invoicesAPI, customersAPI, productsAPI } from '../../services/api';
+import { invoicesAPI, customersAPI, productsAPI, offersAPI } from '../../services/api';
 
 const CreateInvoice = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
+  const [activeOffers, setActiveOffers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showProductDropdown, setShowProductDropdown] = useState(false);
+  const [couponCodeInput, setCouponCodeInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   const [formData, setFormData] = useState({
     customer_id: '',
@@ -33,12 +36,14 @@ const CreateInvoice = () => {
 
   const fetchData = async () => {
     try {
-      const [customersRes, productsRes] = await Promise.all([
+      const [customersRes, productsRes, offersRes] = await Promise.all([
         customersAPI.getAll(),
-        productsAPI.getAll()
+        productsAPI.getAll(),
+        offersAPI.getActive()
       ]);
       setCustomers(customersRes.data);
       setProducts(productsRes.data);
+      setActiveOffers(offersRes.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Failed to load data');
@@ -71,7 +76,6 @@ const CreateInvoice = () => {
     }
     
     setSearchQuery('');
-    setShowProductDropdown(false);
   };
 
   const handleUpdateItem = (index, field, value) => {
@@ -92,21 +96,78 @@ const CreateInvoice = () => {
     });
   };
 
+  const applyCouponCode = () => {
+    const code = couponCodeInput.trim();
+    if (!code) {
+      toast.error('Enter a coupon code');
+      return;
+    }
+
+    const matchedOffer = activeOffers.find(
+      (offer) => (offer.offer_code || '').toUpperCase() === code.toUpperCase()
+    );
+
+    if (!matchedOffer || !matchedOffer.discount_percentage) {
+      toast.error('Invalid or inactive coupon code');
+      return;
+    }
+
+    setAppliedCoupon(matchedOffer);
+    toast.success(`Coupon applied: ${matchedOffer.discount_percentage}% off`);
+  };
+
+  const applyOfferCoupon = (offer) => {
+    if (!offer?.offer_code || !offer.discount_percentage) {
+      return;
+    }
+
+    setCouponCodeInput(offer.offer_code.toUpperCase());
+    setAppliedCoupon(offer);
+    toast.success(`Coupon applied: ${offer.discount_percentage}% off`);
+  };
+
+  const removeCouponCode = () => {
+    setAppliedCoupon(null);
+    setCouponCodeInput('');
+  };
+
+  const getDiscountAmount = () => {
+    const subtotal = calculateSubtotal();
+    if (subtotal <= 0) {
+      return 0;
+    }
+
+    if (appliedCoupon?.discount_percentage) {
+      return (subtotal * Number(appliedCoupon.discount_percentage)) / 100;
+    }
+
+    const manualDiscount = parseFloat(formData.discount) || 0;
+    return Math.max(0, Math.min(manualDiscount, subtotal));
+  };
+
+  const getEffectiveDiscountRate = () => {
+    const subtotal = calculateSubtotal();
+    if (subtotal <= 0) {
+      return 0;
+    }
+
+    const discountAmount = getDiscountAmount();
+    return (discountAmount / subtotal) * 100;
+  };
+
   const calculateSubtotal = () => {
     return formData.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
   };
 
   const calculateTax = () => {
     const subtotal = calculateSubtotal();
-    const afterDiscount = subtotal - (formData.discount || 0);
-    return afterDiscount * (formData.tax_percent / 100);
+    return subtotal * ((parseFloat(formData.tax_percent) || 0) / 100);
   };
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
-    const afterDiscount = subtotal - (formData.discount || 0);
-    const tax = afterDiscount * (formData.tax_percent / 100);
-    return afterDiscount + tax;
+    const tax = calculateTax();
+    return subtotal + tax - getDiscountAmount();
   };
 
   const handleSubmit = async (e) => {
@@ -126,11 +187,15 @@ const CreateInvoice = () => {
 
     try {
       const today = new Date().toISOString().split('T')[0];
+      const effectiveDiscountRate = getEffectiveDiscountRate();
       const payload = {
         customer_id: formData.customer_id, // UUID string, don't parseInt
         invoice_date: today,
         due_date: null,
-        notes: formData.notes || null,
+        notes: [
+          formData.notes,
+          appliedCoupon?.offer_code ? `Coupon Applied: ${appliedCoupon.offer_code}` : null
+        ].filter(Boolean).join('\n') || null,
         status: 'draft',
         payment_status: 'pending',
         items: formData.items.map(item => ({
@@ -140,8 +205,8 @@ const CreateInvoice = () => {
           quantity: item.quantity,
           unit: item.unit || 'piece',
           unit_price: item.unit_price,
-          tax_rate: formData.tax_percent || 0,
-          discount_rate: 0
+          tax_rate: parseFloat(formData.tax_percent) || 0,
+          discount_rate: effectiveDiscountRate
         }))
       };
 
@@ -210,6 +275,11 @@ const CreateInvoice = () => {
     product.brand?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const visibleProducts = (searchQuery ? filteredProducts : products).slice(0, 12);
+  const availableCoupons = activeOffers.filter(
+    (offer) => offer.offer_code && offer.discount_percentage
+  );
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -266,39 +336,32 @@ const CreateInvoice = () => {
                 type="text"
                 placeholder="Search and add products..."
                 value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setShowProductDropdown(true);
-                }}
-                onFocus={() => setShowProductDropdown(true)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="input pl-10"
               />
-              
-              {/* Product Dropdown */}
-              {showProductDropdown && searchQuery && (
-                <div className="absolute z-10 w-full mt-1 bg-white rounded-lg shadow-lg border max-h-60 overflow-y-auto">
-                  {filteredProducts.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">No products found</div>
-                  ) : (
-                    filteredProducts.slice(0, 10).map(product => (
-                      <button
-                        key={product.id}
-                        type="button"
-                        onClick={() => handleAddItem(product)}
-                        className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center justify-between border-b last:border-b-0"
-                      >
-                        <div>
-                          <p className="font-medium text-gray-900">{product.name}</p>
-                          <p className="text-sm text-gray-500">{product.brand}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium text-gray-900">{formatCurrency(product.price)}</p>
-                          <p className="text-sm text-gray-500">per {product.unit}</p>
-                        </div>
-                      </button>
-                    ))
-                  )}
-                </div>
+            </div>
+
+            <div className="mb-6 rounded-lg border border-gray-200 max-h-64 overflow-y-auto">
+              {visibleProducts.length === 0 ? (
+                <div className="p-4 text-center text-gray-500">No products found</div>
+              ) : (
+                visibleProducts.map(product => (
+                  <button
+                    key={product.id}
+                    type="button"
+                    onClick={() => handleAddItem(product)}
+                    className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center justify-between border-b last:border-b-0"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900">{product.name}</p>
+                      <p className="text-sm text-gray-500">{product.brand || 'No brand'}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-gray-900">{formatCurrency(product.price)}</p>
+                      <p className="text-sm text-gray-500">per {product.unit}</p>
+                    </div>
+                  </button>
+                ))
               )}
             </div>
 
@@ -393,14 +456,82 @@ const CreateInvoice = () => {
                   value={formData.discount}
                   onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                   min="0"
+                  disabled={Boolean(appliedCoupon)}
                   className="input"
                 />
+                {appliedCoupon && (
+                  <p className="text-xs text-green-600 mt-1">Manual discount is disabled when coupon is applied.</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Coupon Code</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={couponCodeInput}
+                      onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                      placeholder="Enter coupon code"
+                      className="input pl-9"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={applyCouponCode}
+                    className="px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50"
+                  >
+                    Apply
+                  </button>
+                </div>
+
+                {availableCoupons.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs text-gray-500 mb-2">Available Coupons</p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableCoupons.map((offer) => {
+                        const isSelected = appliedCoupon?.id === offer.id;
+
+                        return (
+                          <button
+                            key={offer.id}
+                            type="button"
+                            onClick={() => applyOfferCoupon(offer)}
+                            className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                              isSelected
+                                ? 'bg-green-100 text-green-800 border-green-300'
+                                : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
+                            }`}
+                          >
+                            {offer.offer_code.toUpperCase()} ({offer.discount_percentage}% OFF)
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {appliedCoupon && (
+                  <div className="mt-2 flex items-center justify-between text-sm bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                    <span className="text-green-700 font-medium">
+                      {appliedCoupon.offer_code} applied ({appliedCoupon.discount_percentage}% off)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={removeCouponCode}
+                      className="text-green-700 hover:text-green-900"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-between text-gray-600">
                 <span>After Discount</span>
                 <span className="font-medium">
-                  {formatCurrency(calculateSubtotal() - (formData.discount || 0))}
+                  {formatCurrency(calculateSubtotal() - getDiscountAmount())}
                 </span>
               </div>
 
