@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --accent-blue: #2563eb;
+  --accent-amber: #f59e0b;
+  --surface-glass: rgba(255, 255, 255, 0.8);
+}
+
 /* Custom base styles */
 @layer base {
   html {
@@ -10,6 +16,9 @@
   
   body {
     @apply font-sans antialiased text-gray-800 bg-gray-50;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.08), transparent 45%),
+      radial-gradient(circle at 100% 100%, rgba(245, 158, 11, 0.08), transparent 40%);
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -22,6 +31,42 @@
   /* Button styles */
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.35), transparent 60%);
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 280ms ease, transform 320ms ease;
+    pointer-events: none;
+  }
+
+  .btn:hover::after,
+  .btn:focus-visible::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .btn:hover {
+    transform: translateY(-1px) scale(1.015);
+  }
+
+  .btn svg,
+  button svg,
+  a svg {
+    transition: transform 240ms ease, color 220ms ease;
+  }
+
+  .btn:hover svg,
+  button:hover svg,
+  a:hover svg {
+    transform: translateY(-1px);
   }
   
   .btn-primary {
@@ -72,6 +117,12 @@
   /* Input styles */
   .input {
     @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+
+  .input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px -14px rgba(37, 99, 235, 0.7);
   }
   
   .input-error {
@@ -119,11 +170,24 @@
   
   /* Gradient backgrounds */
   .gradient-primary {
-    @apply bg-gradient-to-r from-primary-600 to-primary-800;
+    @apply bg-gradient-to-r from-primary-700 via-primary-600 to-primary-800;
   }
   
   .gradient-amber {
     @apply bg-gradient-to-r from-amber-500 to-amber-600;
+  }
+
+  .section-divider {
+    height: 56px;
+    background:
+      linear-gradient(135deg, rgba(37, 99, 235, 0.16), rgba(245, 158, 11, 0.14)),
+      repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.2) 8px,
+        rgba(255, 255, 255, 0.08) 8px,
+        rgba(255, 255, 255, 0.08) 16px
+      );
   }
   
   /* Table styles */
@@ -170,6 +234,552 @@
   .slide-in {
     animation: slideUp 0.5s ease-out forwards;
   }
+
+  .icon-animate {
+    transition: transform 260ms ease, color 220ms ease;
+  }
+
+  .icon-animate:hover {
+    transform: translateY(-2px) scale(1.08);
+  }
+
+  .skeleton-shimmer {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: #e5e7eb;
+  }
+
+  .skeleton-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+    animation: shimmer 1.35s linear infinite;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes logoGlide {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(12px, -7px, 0);
+  }
+  50% {
+    transform: translate3d(4px, -2px, 0);
+  }
+  75% {
+    transform: translate3d(-11px, 5px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes logoParticleCross {
+  0% {
+    transform: translate3d(-26px, 0, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.35;
+  }
+  55% {
+    opacity: 0.7;
+  }
+  88% {
+    opacity: 0.28;
+  }
+  100% {
+    transform: translate3d(26px, 0, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes logoParticleCrossLarge {
+  0% {
+    transform: translate3d(-42px, 0, 0);
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.32;
+  }
+  58% {
+    opacity: 0.62;
+  }
+  90% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translate3d(42px, 0, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes navLogoGlide {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(5px, -3px, 0);
+  }
+  50% {
+    transform: translate3d(2px, -1px, 0);
+  }
+  75% {
+    transform: translate3d(-4px, 2px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroGoodsFloatA {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-6deg);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(-2deg);
+    opacity: 1;
+  }
+}
+
+@keyframes heroGoodsFloatB {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(8deg);
+    opacity: 0.72;
+  }
+  50% {
+    transform: translate3d(0, 12px, 0) rotate(4deg);
+    opacity: 1;
+  }
+}
+
+@keyframes heroGoodsFloatC {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(2deg);
+    opacity: 0.76;
+  }
+  50% {
+    transform: translate3d(0, -8px, 0) rotate(7deg);
+    opacity: 1;
+  }
+}
+
+@keyframes heroGoodsFloatD {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-4deg);
+    opacity: 0.74;
+  }
+  50% {
+    transform: translate3d(0, -7px, 0) rotate(-1deg);
+    opacity: 1;
+  }
+}
+
+@keyframes heroGoodsFloatE {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(6deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate3d(0, 9px, 0) rotate(2deg);
+    opacity: 1;
+  }
+}
+
+.hero-right-goods {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: min(42vw, 34rem);
+  height: min(42vw, 34rem);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.hero-right-goods-orb {
+  position: absolute;
+  inset: 8% 10% 8% 10%;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 55%, transparent 72%);
+  filter: blur(2px);
+}
+
+.hero-right-goods-item {
+  position: absolute;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 30px -18px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #111827;
+  backdrop-filter: blur(4px);
+}
+
+.hero-right-goods-label {
+  width: auto;
+  min-width: 4.6rem;
+  height: 2rem;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(17, 24, 39, 0.95);
+  background: rgba(255, 255, 255, 0.88);
+  text-transform: uppercase;
+}
+
+.hero-right-goods-item-1 {
+  left: 18%;
+  top: 22%;
+  animation: heroGoodsFloatA 3.6s ease-in-out infinite;
+}
+
+.hero-right-goods-item-2 {
+  left: 50%;
+  top: 14%;
+  animation: heroGoodsFloatB 4.2s ease-in-out infinite;
+  animation-delay: -0.9s;
+}
+
+.hero-right-goods-item-3 {
+  left: 30%;
+  top: 46%;
+  animation: heroGoodsFloatC 3.8s ease-in-out infinite;
+  animation-delay: -1.5s;
+}
+
+.hero-right-goods-item-4 {
+  left: 58%;
+  top: 40%;
+  animation: heroGoodsFloatA 4.5s ease-in-out infinite;
+  animation-delay: -0.55s;
+}
+
+.hero-right-goods-item-5 {
+  left: 45%;
+  top: 66%;
+  animation: heroGoodsFloatB 3.9s ease-in-out infinite;
+  animation-delay: -1.2s;
+}
+
+.hero-right-goods-item-8 {
+  left: 72%;
+  top: 64%;
+  animation: heroGoodsFloatA 4.8s ease-in-out infinite;
+  animation-delay: -0.35s;
+}
+
+.hero-right-goods-item-9 {
+  left: 22%;
+  top: 74%;
+  animation: heroGoodsFloatD 4.3s ease-in-out infinite;
+  animation-delay: -1.35s;
+}
+
+.hero-right-goods-item-10 {
+  left: 8%;
+  top: 34%;
+  animation: heroGoodsFloatE 4.7s ease-in-out infinite;
+  animation-delay: -0.15s;
+}
+
+.hero-right-goods-item-11 {
+  left: 80%;
+  top: 48%;
+  animation: heroGoodsFloatB 4.1s ease-in-out infinite;
+  animation-delay: -0.95s;
+}
+
+.hero-right-goods-item-12 {
+  left: 56%;
+  top: 78%;
+  animation: heroGoodsFloatC 4.9s ease-in-out infinite;
+  animation-delay: -1.8s;
+}
+
+.logo-flight-wrap {
+  position: relative;
+  animation: logoGlide 2.5s ease-in-out infinite;
+}
+
+.logo-flight {
+  filter: drop-shadow(0 6px 8px rgba(15, 23, 42, 0.2));
+}
+
+.logo-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.logo-particle {
+  position: absolute;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(37, 99, 235, 0.55), rgba(255, 255, 255, 0.05));
+  filter: blur(0.2px);
+}
+
+.logo-particle-1 {
+  width: 16px;
+  height: 1.6px;
+  top: 36%;
+  left: 50%;
+  margin-left: -8px;
+  animation: logoParticleCrossLarge 1.8s linear infinite;
+}
+
+.logo-particle-2 {
+  width: 12px;
+  height: 1.4px;
+  top: 53%;
+  left: 50%;
+  margin-left: -6px;
+  animation: logoParticleCross 1.2s linear infinite;
+  animation-delay: 0.25s;
+}
+
+.logo-particle-3 {
+  width: 14px;
+  height: 1.5px;
+  top: 66%;
+  left: 50%;
+  margin-left: -7px;
+  animation: logoParticleCrossLarge 1.45s linear infinite;
+  animation-delay: 0.62s;
+}
+
+.nav-logo-flight-wrap {
+  animation: navLogoGlide 3.4s ease-in-out infinite;
+}
+
+.nav-logo-flight {
+  filter: drop-shadow(0 5px 7px rgba(15, 23, 42, 0.24));
+}
+
+.nav-logo-particle {
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.06));
+  filter: blur(0.25px);
+}
+
+.nav-logo-particles .logo-particle-1 {
+  animation-duration: 2.25s;
+}
+
+  .hero-right-goods-item {
+    animation-duration: 4s !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .hero-right-goods-label {
+    animation-duration: 4s !important;
+  }
+
+.nav-logo-particles .logo-particle-2 {
+  animation-duration: 1.6s;
+}
+
+.nav-logo-particles .logo-particle-3 {
+  animation-duration: 1.9s;
+}
+
+@keyframes airflowTopOuter {
+  0% {
+    transform: translate3d(150px, -42px, 0) scale(0.72);
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.5;
+  }
+  52% {
+    transform: translate3d(24px, -58px, 0) scale(0.9);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(-160px, -26px, 0) scale(0.74);
+    opacity: 0;
+  }
+}
+
+@keyframes airflowTopMid {
+  0% {
+    transform: translate3d(138px, -24px, 0) scale(0.74);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.52;
+  }
+  50% {
+    transform: translate3d(18px, -34px, 0) scale(0.95);
+    opacity: 0.92;
+  }
+  100% {
+    transform: translate3d(-152px, -12px, 0) scale(0.76);
+    opacity: 0;
+  }
+}
+
+@keyframes airflowTopInner {
+  0% {
+    transform: translate3d(126px, -8px, 0) scale(0.76);
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.5;
+  }
+  48% {
+    transform: translate3d(14px, -16px, 0) scale(0.96);
+    opacity: 0.88;
+  }
+  100% {
+    transform: translate3d(-146px, -4px, 0) scale(0.78);
+    opacity: 0;
+  }
+}
+
+@keyframes airflowBottomInner {
+  0% {
+    transform: translate3d(126px, 10px, 0) scale(0.76);
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.5;
+  }
+  48% {
+    transform: translate3d(14px, 20px, 0) scale(0.96);
+    opacity: 0.88;
+  }
+  100% {
+    transform: translate3d(-146px, 8px, 0) scale(0.78);
+    opacity: 0;
+  }
+}
+
+@keyframes airflowBottomMid {
+  0% {
+    transform: translate3d(138px, 28px, 0) scale(0.74);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.52;
+  }
+  50% {
+    transform: translate3d(18px, 42px, 0) scale(0.95);
+    opacity: 0.92;
+  }
+  100% {
+    transform: translate3d(-152px, 20px, 0) scale(0.76);
+    opacity: 0;
+  }
+}
+
+@keyframes airflowBottomOuter {
+  0% {
+    transform: translate3d(150px, 46px, 0) scale(0.72);
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.5;
+  }
+  52% {
+    transform: translate3d(24px, 64px, 0) scale(0.9);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(-160px, 30px, 0) scale(0.74);
+    opacity: 0;
+  }
+}
+
+@keyframes logoItemFlutter {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-5deg) translateY(-1px);
+  }
+}
+
+.logo-orbit-items {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.logo-orbit-item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 16px -12px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(1px);
+  will-change: transform, opacity;
+}
+
+.logo-orbit-item svg {
+  animation: logoItemFlutter 1.35s ease-in-out infinite;
+}
+
+.logo-orbit-item-1 {
+  animation: airflowTopOuter 2.55s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.logo-orbit-item-2 {
+  animation: airflowTopMid 2.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: -0.45s;
+}
+
+.logo-orbit-item-3 {
+  animation: airflowTopInner 2.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: -0.82s;
+}
+
+.logo-orbit-item-4 {
+  animation: airflowBottomInner 2.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: -0.28s;
+}
+
+.logo-orbit-item-5 {
+  animation: airflowBottomMid 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: -1.12s;
+}
+
+.logo-orbit-item-6 {
+  animation: airflowBottomOuter 2.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: -1.58s;
 }
 
 /* Scrollbar styles */
@@ -188,4 +798,50 @@
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-400;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .btn:hover,
+  .input:focus,
+  .icon-animate:hover {
+    transform: none !important;
+  }
+
+  .logo-flight-wrap {
+    animation-duration: 2.5s !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .nav-logo-flight-wrap {
+    animation-duration: 3.4s !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .logo-particle-1,
+  .logo-particle-2,
+  .logo-particle-3 {
+    animation-duration: 1.4s !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .logo-orbit-item {
+    animation-duration: 2.4s !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .logo-orbit-item svg {
+    animation-duration: 1.35s !important;
+    animation-iteration-count: infinite !important;
+  }
 }

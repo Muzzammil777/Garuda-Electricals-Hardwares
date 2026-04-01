@@ -6,11 +6,11 @@ import {
   Calendar, 
   ArrowRight, 
   Sparkles,
-  Clock,
-  Loader2
+  Clock
 } from 'lucide-react';
 import { offersAPI } from '../../services/api';
 import { useSettings } from '../../context/SettingsContext';
+import FlyingEagleLoader from '../../components/animations/FlyingEagleLoader';
 
 const Offers = () => {
   const [offers, setOffers] = useState([]);
@@ -71,7 +71,7 @@ const Offers = () => {
         <div className="container-custom">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+              <FlyingEagleLoader size="md" label="Loading special offers..." />
             </div>
           ) : offers.length === 0 ? (
             <div className="text-center py-20">

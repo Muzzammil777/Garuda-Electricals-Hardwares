@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { invoicesAPI, whatsappAPI } from '../../services/api';
+import FlyingEagleLoader from '../../components/animations/FlyingEagleLoader';
 
 const Invoices = () => {
   const [invoices, setInvoices] = useState([]);
@@ -173,7 +174,7 @@ const Invoices = () => {
       <div className="card overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+            <FlyingEagleLoader size="md" label="Loading invoices..." />
           </div>
         ) : filteredInvoices.length === 0 ? (
           <div className="text-center py-20">

@@ -8,12 +8,19 @@ import {
   MapPin, 
   Phone,
   CheckCircle,
-  Star
+  Star,
+  Wrench,
+  Plug,
+  Lightbulb,
+  Zap
 } from 'lucide-react';
 import { categoriesAPI, productsAPI, offersAPI } from '../../services/api';
 import ProductCard from '../../components/ProductCard';
 import CategoryCard from '../../components/CategoryCard';
 import { useSettings } from '../../context/SettingsContext';
+import HeroIntro from '../../components/animations/HeroIntro';
+import RevealOnScroll from '../../components/animations/RevealOnScroll';
+import ShimmerSkeleton from '../../components/animations/ShimmerSkeleton';
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -60,7 +67,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="animate-fade-in">
+    <div>
       {/* Hero Section */}
       <section className="relative gradient-primary overflow-hidden">
         <div className="absolute inset-0 opacity-10">
@@ -69,7 +76,7 @@ const Home = () => {
         </div>
         
         <div className="container-custom py-16 md:py-24 lg:py-32 relative">
-          <div className="max-w-3xl">
+          <HeroIntro className="relative z-10 max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
               <img src="/logo.png" alt="" className="w-10 h-15 object-contain" />
               <span className="text-sm text-white/90">Since 2009 • Trusted by 5000+ Customers</span>
@@ -106,19 +113,62 @@ const Home = () => {
             {/* Contact Info */}
             <div className="mt-10 flex flex-wrap gap-6 text-white/80">
               <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-amber-400" />
+                <MapPin className="w-5 h-5 text-amber-400 icon-animate" />
                 <span className="text-sm">{settings.business_city}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone className="w-5 h-5 text-amber-400" />
+                <Phone className="w-5 h-5 text-amber-400 icon-animate" />
                 <a href={getCallLink()} className="text-sm hover:text-white">
                   {formatPhone(settings.business_phone)}
                 </a>
               </div>
             </div>
+          </HeroIntro>
+
+          <div className="hero-right-goods hidden lg:block" aria-hidden="true">
+            <div className="hero-right-goods-orb" />
+            <div className="hero-right-goods-item hero-right-goods-item-1">
+              <Plug className="w-8 h-8 text-black" />
+            </div>
+            <div className="hero-right-goods-item hero-right-goods-item-2">
+              <Lightbulb className="w-9 h-9 text-black" />
+            </div>
+            <div className="hero-right-goods-item hero-right-goods-item-3">
+              <Wrench className="w-8 h-8 text-black" />
+            </div>
+            <div className="hero-right-goods-item hero-right-goods-item-4">
+              <Zap className="w-8 h-8 text-black" />
+            </div>
+            <div className="hero-right-goods-item hero-right-goods-item-5">
+              <Plug className="w-7 h-7 text-black" />
+            </div>
+            <div className="hero-right-goods-item hero-right-goods-item-8">
+              <svg className="w-7 h-7 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="4" y="6" width="16" height="12" rx="2" />
+                <path d="M8 6V4" />
+                <path d="M16 6V4" />
+                <path d="M8 18v2" />
+                <path d="M16 18v2" />
+                <path d="M4 10h16" />
+              </svg>
+            </div>
+            <div className="hero-right-goods-item hero-right-goods-item-9">
+              <Wrench className="w-7 h-7 text-black" />
+            </div>
+            <div className="hero-right-goods-item hero-right-goods-item-10">
+              <Plug className="w-7 h-7 text-black" />
+            </div>
+            <div className="hero-right-goods-item hero-right-goods-item-11">
+              <Lightbulb className="w-7 h-7 text-black" />
+            </div>
+            <div className="hero-right-goods-item hero-right-goods-item-12">
+              <Zap className="w-7 h-7 text-black" />
+            </div>
           </div>
         </div>
       </section>
+
+      <div className="section-divider" />
 
       {/* Stats Section */}
       <section className="bg-white py-8 md:py-12 border-b">
@@ -127,13 +177,13 @@ const Home = () => {
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
-                <div key={index} className="text-center">
+                <RevealOnScroll key={index} className="text-center" delay={index * 0.04}>
                   <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-50 rounded-xl mb-3">
-                    <Icon className="w-6 h-6 text-primary-600" />
+                    <Icon className="w-6 h-6 text-primary-600 icon-animate" />
                   </div>
                   <div className="text-2xl md:text-3xl font-bold text-gray-900">{stat.value}</div>
                   <div className="text-sm text-gray-500">{stat.label}</div>
-                </div>
+                </RevealOnScroll>
               );
             })}
           </div>
@@ -143,22 +193,22 @@ const Home = () => {
       {/* Categories Section */}
       <section className="section bg-gray-50">
         <div className="container-custom">
-          <div className="text-center mb-10">
+          <RevealOnScroll className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Shop by Category
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Explore our wide range of electrical and hardware products organized by category
             </p>
-          </div>
+          </RevealOnScroll>
 
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="card p-6 animate-pulse">
-                  <div className="w-12 h-12 bg-gray-200 rounded-xl mb-4" />
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div key={i} className="card p-6">
+                  <ShimmerSkeleton className="w-12 h-12 rounded-xl mb-4" />
+                  <ShimmerSkeleton className="h-4 rounded w-3/4 mb-2" />
+                  <ShimmerSkeleton className="h-3 rounded w-1/2" />
                 </div>
               ))}
             </div>
@@ -175,7 +225,7 @@ const Home = () => {
       {/* Featured Products */}
       <section className="section bg-white">
         <div className="container-custom">
-          <div className="flex items-center justify-between mb-10">
+          <RevealOnScroll className="flex items-center justify-between mb-10">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
                 Featured Products
@@ -191,15 +241,15 @@ const Home = () => {
               View All
               <ArrowRight className="w-4 h-4" />
             </Link>
-          </div>
+          </RevealOnScroll>
 
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="card p-4 animate-pulse">
-                  <div className="aspect-square bg-gray-200 rounded-lg mb-4" />
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div key={i} className="card p-4">
+                  <ShimmerSkeleton className="aspect-square rounded-lg mb-4" />
+                  <ShimmerSkeleton className="h-4 rounded w-3/4 mb-2" />
+                  <ShimmerSkeleton className="h-3 rounded w-1/2" />
                 </div>
               ))}
             </div>
@@ -222,15 +272,16 @@ const Home = () => {
       {/* About Section */}
       <section className="section bg-gray-900 text-white">
         <div className="container-custom">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <RevealOnScroll className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-400 px-4 py-2 rounded-full mb-6">
                 <Award className="w-4 h-4" />
                 <span className="text-sm font-medium">Trusted Since 2009</span>
               </div>
               
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Why Choose <span className="text-amber-400">Garuda Electricals</span>?
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight max-w-xl">
+                <span className="block text-white">Why Choose</span>
+                <span className="block text-amber-400">Garuda Electricals?</span>
               </h2>
               
               <p className="text-gray-300 mb-8">
@@ -260,7 +311,33 @@ const Home = () => {
             <div className="relative">
               <div className="aspect-square bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl overflow-hidden flex items-center justify-center">
                 <div className="text-center">
-                  <img src="/logo.png" alt="Garuda Electricals" className="w-45 h-45 mx-auto mb-6 object-contain" />
+                  <div className="logo-flight-wrap relative w-fit mx-auto mb-6">
+                    <div className="logo-orbit-items" aria-hidden="true">
+                      <span className="logo-orbit-item logo-orbit-item-1">
+                        <Wrench className="w-3.5 h-3.5" />
+                      </span>
+                      <span className="logo-orbit-item logo-orbit-item-2">
+                        <Plug className="w-3.5 h-3.5" />
+                      </span>
+                      <span className="logo-orbit-item logo-orbit-item-3">
+                        <Lightbulb className="w-3.5 h-3.5" />
+                      </span>
+                      <span className="logo-orbit-item logo-orbit-item-4">
+                        <Wrench className="w-3 h-3" />
+                      </span>
+                      <span className="logo-orbit-item logo-orbit-item-5">
+                        <Plug className="w-3 h-3" />
+                      </span>
+                      <span className="logo-orbit-item logo-orbit-item-6">
+                        <Lightbulb className="w-3 h-3" />
+                      </span>
+                    </div>
+                    <img
+                      src="/logo.png"
+                      alt="Garuda Electricals"
+                      className="logo-flight w-45 h-45 mx-auto object-contain"
+                    />
+                  </div>
                   <h3 className="text-2xl font-bold text-white mb-2">Garuda Electricals</h3>
                   <p className="text-white/80">Powering Your World</p>
                 </div>
@@ -279,7 +356,7 @@ const Home = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </RevealOnScroll>
         </div>
       </section>
 
@@ -287,19 +364,20 @@ const Home = () => {
       {offers.length > 0 && (
         <section className="section bg-amber-50">
           <div className="container-custom">
-            <div className="text-center mb-10">
+            <RevealOnScroll className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 Special Offers
               </h2>
               <p className="text-gray-600">
                 Check out our latest deals and promotions
               </p>
-            </div>
+            </RevealOnScroll>
 
             <div className="grid md:grid-cols-2 gap-6">
               {offers.map((offer) => (
-                <div
+                <RevealOnScroll
                   key={offer.id}
+                  delay={0.06}
                   className="card-hover bg-white p-6 md:p-8"
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -323,7 +401,7 @@ const Home = () => {
                     )}
                   </div>
                   <p className="text-gray-600">{offer.description}</p>
-                </div>
+                </RevealOnScroll>
               ))}
             </div>
 

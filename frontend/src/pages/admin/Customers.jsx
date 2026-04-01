@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { customersAPI } from '../../services/api';
+import AnimatedModal from '../../components/animations/AnimatedModal';
+import FlyingEagleLoader from '../../components/animations/FlyingEagleLoader';
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
@@ -146,7 +148,7 @@ const Customers = () => {
       {/* Customers Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+          <FlyingEagleLoader size="md" label="Loading customers..." />
         </div>
       ) : filteredCustomers.length === 0 ? (
         <div className="card text-center py-20">
@@ -221,9 +223,8 @@ const Customers = () => {
       )}
 
       {/* Customer Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg">
+      <AnimatedModal open={showModal} onClose={() => setShowModal(false)}>
+          <div className="bg-white rounded-2xl w-full max-w-lg mx-auto">
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -337,8 +338,7 @@ const Customers = () => {
               </div>
             </form>
           </div>
-        </div>
-      )}
+      </AnimatedModal>
     </div>
   );
 };

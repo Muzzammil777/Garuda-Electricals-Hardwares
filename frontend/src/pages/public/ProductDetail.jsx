@@ -8,12 +8,12 @@ import {
   Tag, 
   Shield, 
   Truck,
-  CheckCircle,
-  Loader2
+  CheckCircle
 } from 'lucide-react';
 import { productsAPI } from '../../services/api';
 import ProductCard from '../../components/ProductCard';
 import { useSettings } from '../../context/SettingsContext';
+import FlyingEagleLoader from '../../components/animations/FlyingEagleLoader';
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -58,7 +58,7 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+        <FlyingEagleLoader size="md" label="Loading product details..." />
       </div>
     );
   }

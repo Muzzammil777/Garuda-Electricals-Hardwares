@@ -4,6 +4,7 @@ import { Search, Filter, X, Loader2, ChevronDown } from 'lucide-react';
 import { productsAPI, categoriesAPI } from '../../services/api';
 import ProductCard from '../../components/ProductCard';
 import CategoryCard from '../../components/CategoryCard';
+import FlyingEagleLoader from '../../components/animations/FlyingEagleLoader';
 
 const ITEMS_PER_PAGE = 40;
 
@@ -135,9 +136,9 @@ const Products = () => {
       {/* Search & Filters */}
       <section className="bg-white border-b sticky top-16 md:top-20 z-40">
         <div className="container-custom py-4">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col gap-4">
             {/* Search Form */}
-            <form onSubmit={handleSearch} className="flex-1">
+            <form onSubmit={handleSearch} className="w-full">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -160,10 +161,10 @@ const Products = () => {
             </button>
 
             {/* Desktop Category Filter */}
-            <div className="hidden md:flex items-center gap-2 overflow-x-auto">
+            <div className="hidden md:flex flex-wrap items-center gap-2">
               <button
                 onClick={() => handleCategoryChange('')}
-                className={`btn-sm whitespace-nowrap ${!categorySlug ? 'btn-primary' : 'btn-secondary'}`}
+                className={`btn-sm px-4 py-2 text-sm whitespace-nowrap shrink-0 ${!categorySlug ? 'btn-primary' : 'btn-secondary'}`}
               >
                 All
               </button>
@@ -171,7 +172,7 @@ const Products = () => {
                 <button
                   key={cat.id}
                   onClick={() => handleCategoryChange(cat.slug)}
-                  className={`btn-sm whitespace-nowrap ${categorySlug === cat.slug ? 'btn-primary' : 'btn-secondary'}`}
+                  className={`btn-sm px-4 py-2 text-sm whitespace-nowrap shrink-0 ${categorySlug === cat.slug ? 'btn-primary' : 'btn-secondary'}`}
                 >
                   {cat.name}
                 </button>
@@ -216,7 +217,7 @@ const Products = () => {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => handleCategoryChange('')}
-                className={`btn-sm ${!categorySlug ? 'btn-primary' : 'btn-secondary'}`}
+                className={`btn-sm whitespace-nowrap ${!categorySlug ? 'btn-primary' : 'btn-secondary'}`}
               >
                 All Products
               </button>
@@ -224,7 +225,7 @@ const Products = () => {
                 <button
                   key={cat.id}
                   onClick={() => handleCategoryChange(cat.slug)}
-                  className={`btn-sm ${categorySlug === cat.slug ? 'btn-primary' : 'btn-secondary'}`}
+                  className={`btn-sm whitespace-nowrap ${categorySlug === cat.slug ? 'btn-primary' : 'btn-secondary'}`}
                 >
                   {cat.name}
                 </button>
@@ -259,7 +260,7 @@ const Products = () => {
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+              <FlyingEagleLoader size="md" label="Loading products..." />
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-20">

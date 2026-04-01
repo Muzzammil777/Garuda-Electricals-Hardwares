@@ -61,35 +61,6 @@ def calculate_invoice_totals(items: list) -> dict:
     }
 
 
-def get_product_quantities(items: list) -> dict:
-    """Aggregate product quantities for stock deduction."""
-    product_quantities = {}
-
-    for item in items:
-        product_id = item.get("product_id")
-        if not product_id:
-            continue
-
-        quantity = Decimal(str(item.get("quantity", 0)))
-        if quantity <= 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invoice item quantity must be greater than zero"
-            )
-
-        # Stock is stored as INTEGER, so linked product quantities must be whole numbers.
-        if quantity != quantity.to_integral_value():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Quantity for product '{item.get('product_name', 'Unknown')}' must be a whole number"
-            )
-
-        product_id_str = str(product_id)
-        product_quantities[product_id_str] = product_quantities.get(product_id_str, 0) + int(quantity)
-
-    return product_quantities
-
-
 @router.get("/", response_model=List[InvoiceSummary])
 async def get_invoices(
     status_filter: Optional[str] = Query(None, description="Filter by status"),
@@ -231,35 +202,6 @@ async def create_invoice(
         items_data.append(item_dict)
     
     totals = calculate_invoice_totals(items_data)
-    product_quantities = get_product_quantities(items_data)
-
-    products_by_id = {}
-    if product_quantities:
-        product_ids = list(product_quantities.keys())
-        products_result = db.table("products").select("id, name, stock_quantity").in_("id", product_ids).execute()
-        products_by_id = {str(product["id"]): product for product in products_result.data or []}
-
-        missing_product_ids = [product_id for product_id in product_ids if product_id not in products_by_id]
-        if missing_product_ids:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="One or more selected products do not exist"
-            )
-
-        insufficient_stock_products = []
-        for product_id, ordered_quantity in product_quantities.items():
-            product = products_by_id[product_id]
-            available_stock = int(product.get("stock_quantity") or 0)
-            if available_stock < ordered_quantity:
-                insufficient_stock_products.append(
-                    f"{product.get('name', 'Unknown')} (available: {available_stock}, requested: {ordered_quantity})"
-                )
-
-        if insufficient_stock_products:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Insufficient stock for: {', '.join(insufficient_stock_products)}"
-            )
     
     # Create invoice
     invoice_insert = {
@@ -291,31 +233,6 @@ async def create_invoice(
             item["product_id"] = str(item["product_id"])
     
     items_result = db.table("invoice_items").insert(items_data).execute()
-
-    if not items_result.data:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create invoice items"
-        )
-
-    # Deduct stock for linked products after invoice items are created.
-    for product_id, ordered_quantity in product_quantities.items():
-        current_stock = int(products_by_id[product_id].get("stock_quantity") or 0)
-        new_stock = current_stock - ordered_quantity
-
-        update_stock_result = (
-            db.table("products")
-            .update({"stock_quantity": new_stock})
-            .eq("id", product_id)
-            .eq("stock_quantity", current_stock)
-            .execute()
-        )
-
-        if not update_stock_result.data:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Product stock changed while creating invoice. Please retry."
-            )
     
     # Get customer info
     customer_result = db.table("customers").select("name, phone, address, gst_number").eq("id", str(invoice_data.customer_id)).execute()

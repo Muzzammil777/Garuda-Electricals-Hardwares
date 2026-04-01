@@ -7,10 +7,10 @@ import {
   IndianRupee,
   TrendingUp,
   ArrowRight,
-  Calendar,
-  Loader2
+  Calendar
 } from 'lucide-react';
 import { dashboardAPI } from '../../services/api';
+import FlyingEagleLoader from '../../components/animations/FlyingEagleLoader';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -55,7 +55,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+        <FlyingEagleLoader size="md" label="Loading dashboard..." />
       </div>
     );
   }

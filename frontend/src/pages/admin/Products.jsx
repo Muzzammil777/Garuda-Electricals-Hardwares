@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { productsAPI, categoriesAPI } from '../../services/api';
+import AnimatedModal from '../../components/animations/AnimatedModal';
+import FlyingEagleLoader from '../../components/animations/FlyingEagleLoader';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -281,7 +283,7 @@ const Products = () => {
       <div className="card overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+            <FlyingEagleLoader size="md" label="Loading products..." />
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="text-center py-20">
@@ -401,9 +403,8 @@ const Products = () => {
       </div>
 
       {/* Product Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <AnimatedModal open={showModal} onClose={() => setShowModal(false)}>
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-auto">
             <div className="p-6 border-b sticky top-0 bg-white">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -729,8 +730,7 @@ const Products = () => {
               </div>
             </form>
           </div>
-        </div>
-      )}
+      </AnimatedModal>
     </div>
   );
 };

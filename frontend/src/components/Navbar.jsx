@@ -1,12 +1,20 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { Menu, X, Phone, LogIn } from 'lucide-react';
+import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion';
 import { useSettings } from '../context/SettingsContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const reduceMotion = useReducedMotion();
+  const { scrollY } = useScroll();
   const { settings, getWhatsAppLink, getCallLink } = useSettings();
+
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    setIsScrolled(latest > 12);
+  });
 
   const navLinks = [
     { path: '/', label: 'Home' },
@@ -22,16 +30,31 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <motion.nav
+      className="sticky top-0 z-50"
+      animate={{
+        backgroundColor: isScrolled ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.98)',
+        boxShadow: isScrolled ? '0 10px 24px -14px rgba(15,23,42,0.35)' : '0 4px 14px -12px rgba(15,23,42,0.22)'
+      }}
+      transition={{ duration: reduceMotion ? 0.16 : 0.28, ease: 'easeOut' }}
+      style={{ backdropFilter: 'blur(10px)' }}
+    >
       <div className="container-custom">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img 
-              src="/logo.png" 
-              alt="Garuda Electricals" 
-              className="w-14 h-14 md:w-28 md:h-28 object-contain"
-            />
+            <div className="logo-flight-wrap nav-logo-flight-wrap flex items-center justify-center">
+              <span className="logo-particles nav-logo-particles" aria-hidden="true">
+                <span className="logo-particle logo-particle-1 nav-logo-particle" />
+                <span className="logo-particle logo-particle-2 nav-logo-particle" />
+                <span className="logo-particle logo-particle-3 nav-logo-particle" />
+              </span>
+              <img
+                src="/logo.png"
+                alt="Garuda Electricals"
+                className="logo-flight nav-logo-flight w-14 h-14 md:w-28 md:h-28 object-contain"
+              />
+            </div>
             <div className="block max-w-[10.5rem] sm:max-w-none">
               <h1 className="text-sm sm:text-lg md:text-xl font-bold text-gray-900 leading-tight line-clamp-2 sm:line-clamp-none">
                 {settings.business_name || 'Garuda Electricals'}
@@ -74,14 +97,14 @@ const Navbar = () => {
               href={getCallLink()}
               className="btn-primary btn-sm flex items-center gap-2"
             >
-              <Phone className="w-4 h-4" />
+              <Phone className="w-4 h-4 icon-animate" />
               Call Us
             </a>
             <Link
               to="/admin/login"
               className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
             >
-              <LogIn className="w-4 h-4" />
+              <LogIn className="w-4 h-4 icon-animate" />
               Admin
             </Link>
           </div>
@@ -96,8 +119,15 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden py-4 border-t animate-slide-down">
+        <AnimatePresence>
+          {isOpen && (
+          <motion.div
+            className="md:hidden py-4 border-t"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: reduceMotion ? 0.14 : 0.24, ease: 'easeOut' }}
+          >
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <Link
@@ -139,15 +169,16 @@ const Navbar = () => {
                   href={getCallLink()}
                   className="btn-primary flex-1 flex items-center justify-center gap-2"
                 >
-                  <Phone className="w-5 h-5" />
+                  <Phone className="w-5 h-5 icon-animate" />
                   Call
                 </a>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 
