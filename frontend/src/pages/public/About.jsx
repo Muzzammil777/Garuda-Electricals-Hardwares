@@ -1,4 +1,4 @@
-import { Award, Users, Target, Heart, CheckCircle } from 'lucide-react';
+import { Award, Users, Target, Heart, CheckCircle, Wrench, Plug, Lightbulb } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSettings } from '../../context/SettingsContext';
 
@@ -94,9 +94,42 @@ const About = () => {
             </div>
             
             <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center">
+              <div className="about-story-flight-card aspect-square bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center">
                 <div className="text-center p-8">
-                  <img src="/logo.png" alt="Garuda Electricals" className="w-42 h-42 mx-auto mb-6 object-contain" />
+                  <div className="about-eagle-flight-path mx-auto mb-6">
+                    <div className="logo-flight-wrap relative w-fit mx-auto about-eagle-stage">
+                      <div className="logo-orbit-items" aria-hidden="true">
+                        <span className="logo-orbit-item logo-orbit-item-1">
+                          <Wrench className="w-3.5 h-3.5" />
+                        </span>
+                        <span className="logo-orbit-item logo-orbit-item-2">
+                          <Plug className="w-3.5 h-3.5" />
+                        </span>
+                        <span className="logo-orbit-item logo-orbit-item-3">
+                          <Lightbulb className="w-3.5 h-3.5" />
+                        </span>
+                        <span className="logo-orbit-item logo-orbit-item-4">
+                          <Wrench className="w-3 h-3" />
+                        </span>
+                        <span className="logo-orbit-item logo-orbit-item-5">
+                          <Plug className="w-3 h-3" />
+                        </span>
+                        <span className="logo-orbit-item logo-orbit-item-6">
+                          <Lightbulb className="w-3 h-3" />
+                        </span>
+                      </div>
+                      <span className="logo-particles about-logo-particles" aria-hidden="true">
+                        <span className="logo-particle logo-particle-1" />
+                        <span className="logo-particle logo-particle-2" />
+                        <span className="logo-particle logo-particle-3" />
+                      </span>
+                      <img
+                        src="/logo.png"
+                        alt="Garuda Electricals"
+                        className="logo-flight about-eagle-logo mx-auto object-contain w-56 h-56"
+                      />
+                    </div>
+                  </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">15+ Years</h3>
                   <p className="text-gray-600">of Excellence in Service</p>
                 </div>
