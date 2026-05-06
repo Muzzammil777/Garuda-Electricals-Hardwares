@@ -29,6 +29,8 @@ const Navbar = () => {
     return location.pathname.startsWith(path);
   };
 
+  const showTagline = !(settings.business_name || '').toLowerCase().includes('hardwares');
+
   return (
     <motion.nav
       className="sticky top-0 z-50"
@@ -59,7 +61,9 @@ const Navbar = () => {
               <h1 className="text-sm sm:text-lg md:text-xl font-bold text-gray-900 leading-tight line-clamp-2 sm:line-clamp-none">
                 {settings.business_name || 'Garuda Electricals'}
               </h1>
-              <p className="text-[10px] sm:text-xs text-gray-500 -mt-0.5">& Hardwares</p>
+              {showTagline && (
+                <p className="text-[10px] sm:text-xs text-gray-500 -mt-0.5">& Hardwares</p>
+              )}
             </div>
           </Link>
 
